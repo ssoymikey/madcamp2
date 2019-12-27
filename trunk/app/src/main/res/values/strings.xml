@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Project1_test2</string>
+    <string name="address">연락처</string>
+    <string name="image">갤러리</string>
+    <string name="memo">메모장</string>
+</resources>
