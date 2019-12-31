@@ -4,10 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
@@ -26,6 +28,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.ArrayList;
 
@@ -38,9 +42,10 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
     private Context mContext;
 
     public class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
-        protected TextView id;
+        protected ImageView id;
         protected TextView phoneNumber;
         protected TextView name;
+        protected ImageButton callButton;
 
 
         public CustomViewHolder(View view) {
@@ -48,6 +53,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
             this.id = view.findViewById(R.id.id_listitem);
             this.phoneNumber = view.findViewById(R.id.phone_listitem);
             this.name = view.findViewById(R.id.name_listitem);
+            this.callButton = view.findViewById(R.id.call_button);
 
             view.setOnCreateContextMenuListener(this);
         }
@@ -63,17 +69,20 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
         private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                View view;
+                final ImageButton ButtonSubmit;
+                final EditText editTextNAME;
+                final EditText editTextPHONE;
+
                 switch (item.getItemId()) {
                     case 1001:
                         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                        View view = LayoutInflater.from(mContext).inflate(R.layout.edit_box, null, false);
+                        view = LayoutInflater.from(mContext).inflate(R.layout.edit_box, null, false);
                         builder.setView(view);
-                        final Button ButtonSubmit = view.findViewById(R.id.button_dialog_submit);
-                        final EditText editTextID = view.findViewById(R.id.edittext_dialog_id);
-                        final EditText editTextNAME = view.findViewById(R.id.edittext_dialog_name);
-                        final EditText editTextPHONE = view.findViewById(R.id.edittext_dialog_phone);
+                        ButtonSubmit = view.findViewById(R.id.button_dialog_submit);
+                        editTextNAME = view.findViewById(R.id.edittext_dialog_name);
+                        editTextPHONE = view.findViewById(R.id.edittext_dialog_phone);
 
-                        editTextID.setText(mList.get(getAdapterPosition()).getId());
                         editTextNAME.setText(mList.get(getAdapterPosition()).getUser_Name());
                         editTextPHONE.setText(mList.get(getAdapterPosition()).getUser_phNumber());
 
@@ -83,7 +92,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
                         ButtonSubmit.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                String strID = editTextID.getText().toString();
+                                String strID = mList.get(getAdapterPosition()).getId();
                                 String strNAME = editTextNAME.getText().toString();
                                 String strPHONE = editTextPHONE.getText().toString();
 
@@ -103,13 +112,35 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
                         break;
 
                     case 1002:
-                        long mid = mList.get(getAdapterPosition()).getPersonId();
-                        System.out.println("mid 값 : " + mid);
-                        deleteContact(mContext.getContentResolver(), mid);
+                        AlertDialog.Builder del_builder = new AlertDialog.Builder(mContext);
+                        view = LayoutInflater.from(mContext).inflate(R.layout.delete_box, null, false);
+                        del_builder.setView(view);
+                        ButtonSubmit = view.findViewById(R.id.button_del);
 
-                        mList.remove(getAdapterPosition());
-                        notifyItemRemoved(getAdapterPosition());
-                        notifyItemRangeChanged(getAdapterPosition(), mList.size());
+                        final AlertDialog del_dialog = del_builder.create();
+                        ButtonSubmit.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                long mid = mList.get(getAdapterPosition()).getPersonId();
+                                System.out.println("mid 값 : " + mid);
+                                deleteContact(mContext.getContentResolver(), mid);
+
+                                mList.remove(getAdapterPosition());
+                                notifyItemRemoved(getAdapterPosition());
+                                notifyItemRangeChanged(getAdapterPosition(), mList.size());
+
+                                del_dialog.dismiss();
+                            }
+                        });
+
+                        del_dialog.show();
+//                        long mid = mList.get(getAdapterPosition()).getPersonId();
+//                        System.out.println("mid 값 : " + mid);
+//                        deleteContact(mContext.getContentResolver(), mid);
+//
+//                        mList.remove(getAdapterPosition());
+//                        notifyItemRemoved(getAdapterPosition());
+//                        notifyItemRangeChanged(getAdapterPosition(), mList.size());
 
                         break;
                 }
@@ -258,18 +289,25 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
 
     @Override
     public void onBindViewHolder(@NonNull CustomViewHolder viewholder, int position) {
+        final int pos = position;
 
-        viewholder.id.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         viewholder.phoneNumber.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         viewholder.name.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
 
-        viewholder.id.setGravity(Gravity.CENTER);
         viewholder.phoneNumber.setGravity(Gravity.CENTER);
         viewholder.name.setGravity(Gravity.CENTER);
 
-        viewholder.id.setText(mList.get(position).getId());
         viewholder.phoneNumber.setText(mList.get(position).getUser_phNumber());
         viewholder.name.setText(mList.get(position).getUser_Name());
+
+        viewholder.callButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mContext.checkSelfPermission(Manifest.permission.CALL_PHONE+"");
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + mList.get(pos).getUser_phNumber()));
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     @Override

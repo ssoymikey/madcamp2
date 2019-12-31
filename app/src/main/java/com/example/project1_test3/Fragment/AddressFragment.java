@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -41,10 +42,6 @@ public class AddressFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_address, container, false);
 
-        Permission permission = new Permission();
-        permission.checkPermissions(v.getContext());
-
-
         RecyclerView mRecyclerView = v.findViewById(R.id.recyclerview_main_list);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(v.getContext());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
@@ -66,7 +63,7 @@ public class AddressFragment extends Fragment {
         mAdapter.notifyDataSetChanged();
 
 
-        Button buttonInsert = v.findViewById(R.id.button_main_insert);
+        ImageButton buttonInsert = v.findViewById(R.id.button_main_insert);
         buttonInsert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,14 +71,11 @@ public class AddressFragment extends Fragment {
                 View view = LayoutInflater.from(v.getContext()).inflate(R.layout.edit_box, null, false);
                 builder.setView(view);
 
-                final Button ButtonSubmit = view.findViewById(R.id.button_dialog_submit);
-                final EditText editTextID = view.findViewById(R.id.edittext_dialog_id);
+                final ImageButton ButtonSubmit = view.findViewById(R.id.button_dialog_submit);
                 final EditText editTextNAME = view.findViewById(R.id.edittext_dialog_name);
                 final EditText editTextPHONE = view.findViewById(R.id.edittext_dialog_phone);
 
                 editTextPHONE.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
-
-                ButtonSubmit.setText("삽입");
 
                 final AlertDialog dialog = builder.create();
 
@@ -93,7 +87,7 @@ public class AddressFragment extends Fragment {
 
 
                         // 4. 사용자가 입력한 내용을 가져와서
-                        String strID = editTextID.getText().toString();
+                        String strID = ((count+1) +"").toString();
                         String strName = editTextNAME.getText().toString();
                         String strPhone = editTextPHONE.getText().toString();
 
@@ -132,15 +126,39 @@ public class AddressFragment extends Fragment {
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
             final int position = viewHolder.getAdapterPosition();
-            System.out.println("position : " + position);
-            System.out.println("mArrayList index : " + mArrayList.get(position).getUser_Name());
+//            System.out.println("position : " + position);
+//            System.out.println("mArrayList index : " + mArrayList.get(position).getUser_Name());
+//
+//            deleteContact(v.getContext().getContentResolver(), mArrayList.get(position).getPersonId());
+//
+//            mArrayList.remove(position);
+//            mAdapter.notifyItemRemoved(position);
 
-            deleteContact(v.getContext().getContentResolver(), mArrayList.get(position).getPersonId());
+            AlertDialog.Builder del_builder = new AlertDialog.Builder(v.getContext());
+            v = LayoutInflater.from(v.getContext()).inflate(R.layout.delete_box, null, false);
+            del_builder.setView(v);
+            final ImageButton ButtonSubmit = v.findViewById(R.id.button_del);
 
-            mArrayList.remove(position);
-            mAdapter.notifyItemRemoved(position);
+            final AlertDialog del_dialog = del_builder.create();
+            ButtonSubmit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    long mid = mArrayList.get(position).getPersonId();
+                    System.out.println("mid 값 : " + mid);
+                    deleteContact(v.getContext().getContentResolver(), mid);
 
+                    mArrayList.remove(position);
+                    mAdapter.notifyItemRemoved(position);
 
+                    del_dialog.dismiss();
+
+                    mAdapter.notifyDataSetChanged();
+                }
+            });
+
+            del_dialog.show();
+
+            mAdapter.notifyDataSetChanged();
         }
     };
 

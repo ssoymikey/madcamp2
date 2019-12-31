@@ -15,8 +15,11 @@ import java.util.List;
 public class Permission {
     // 멀티 퍼미션 지정
     private String[] permissions = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_CONTACTS,
             Manifest.permission.WRITE_CONTACTS, // 주소록 액세스 권한
+            Manifest.permission.CALL_PHONE
     };
     private static final int MULTIPLE_PERMISSIONS = 101;
 

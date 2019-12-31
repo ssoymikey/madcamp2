@@ -4,14 +4,22 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/layout_tab"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:theme="@style/TabTheme"
+        android:id="@+id/appBar">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/layout_tab"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/pager_content"
-        android:layout_below="@id/layout_tab"
+        android:layout_below="@id/appBar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

@@ -6,7 +6,6 @@
     <GridView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/text2"
         android:id="@+id/gridview"
         android:columnWidth="100dp"
         android:numColumns="auto_fit"
@@ -25,11 +24,18 @@
         android:paddingBottom="25sp"
         android:visibility="invisible" />
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+    <ImageButton
+        style="@style/Widget.AppCompat.Button.Colored"
         android:id="@+id/camera_btn"
-        android:text="사진 촬영" />
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:padding="17dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/round_button"
+        android:src="@drawable/camera_add"
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="20dp"/>
 
 </RelativeLayout>

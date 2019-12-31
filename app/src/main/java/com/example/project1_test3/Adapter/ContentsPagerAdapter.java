@@ -40,4 +40,9 @@ public class ContentsPagerAdapter extends FragmentStatePagerAdapter {
     public int getCount() {
         return tabCount;
     }
+
+    @Override
+    public CharSequence getPageTitle(int position) {
+        return null;
+    }
 }

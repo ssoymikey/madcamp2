@@ -8,7 +8,12 @@ import androidx.viewpager.widget.ViewPager;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.Window;
+
 import com.example.project1_test3.Adapter.ContentsPagerAdapter;
+import com.example.project1_test3.Fragment.AddressFragment;
+import com.example.project1_test3.Fragment.ImageFragment;
+import com.example.project1_test3.Fragment.MemoFragment;
 import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,27 +26,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        1);
-            }
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        1);
-            }
-        }
+        Permission permission = new Permission();
+        permission.checkPermissions(MainActivity.this);
+
 
         tabLayout = findViewById(R.id.layout_tab);
-        tabLayout.addTab(tabLayout.newTab().setText("연락처"));
-        tabLayout.addTab(tabLayout.newTab().setText("갤러리"));
-        tabLayout.addTab(tabLayout.newTab().setText("메모장"));
+//        tabLayout.addTab(tabLayout.newTab().setText("연락처"));
+//        tabLayout.addTab(tabLayout.newTab().setText("갤러리"));
+//        tabLayout.addTab(tabLayout.newTab().setText("메모장"));
+        tabLayout.addTab(tabLayout.newTab());
+        tabLayout.addTab(tabLayout.newTab());
+        tabLayout.addTab(tabLayout.newTab());
+        tabLayout.getTabAt(0).setIcon(R.drawable.stick_man_b);
+        tabLayout.getTabAt(1).setIcon(R.drawable.picture);
+        tabLayout.getTabAt(2).setIcon(R.drawable.paint_brushes);
 
         viewPager = findViewById(R.id.pager_content);
         mContentsPagerAdapter = new ContentsPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
@@ -52,6 +50,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
+                tabLayout.getTabAt(0).setIcon(R.drawable.stick_man);
+                tabLayout.getTabAt(1).setIcon(R.drawable.picture);
+                tabLayout.getTabAt(2).setIcon(R.drawable.paint_brushes);
+                switch (tab.getPosition()) {
+                    case 0:
+                        tabLayout.getTabAt(0).setIcon(R.drawable.stick_man_b);
+                        break;
+                    case 1:
+                        tabLayout.getTabAt(1).setIcon(R.drawable.picture_b);
+                        break;
+                    case 2:
+                        tabLayout.getTabAt(2).setIcon(R.drawable.paint_brushes_b);
+                        break;
+                }
             }
 
             @Override

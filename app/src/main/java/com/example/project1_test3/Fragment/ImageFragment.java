@@ -35,6 +35,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.Gallery;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -77,22 +78,22 @@ public class ImageFragment extends Fragment {
     private SliderAdapter sliderAdapter;
 
     private Dialog dialog;
-    private Button btn;
+    private ImageButton btn;
     private String currentPhotoPath;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_image, container, false);
 
+        // 사진 찍는 함수
         takePicture();
         // 갤러리 켜는 함수
         startGallery();
-        //firstAction();
 
         return v;
     }
 
     public void takePicture() {
-        btn = (Button) v.findViewById(R.id.camera_btn);
+        btn = (ImageButton) v.findViewById(R.id.camera_btn);
 
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,6 +101,7 @@ public class ImageFragment extends Fragment {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
                 if(intent.resolveActivity(v.getContext().getPackageManager()) != null) {
+                    // 찍은것 저장할 파일 만들기
                     File photoFile = null;
 
                     @SuppressLint("SimpleDateFormat") SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
@@ -119,6 +121,7 @@ public class ImageFragment extends Fragment {
                         ex.printStackTrace();
                     }
 
+                    // 카메라 Activity 불러오기
                     if(photoFile != null) {
                         currentPhotoPath = photoFile.getAbsolutePath();
                         intent.putExtra(MediaStore.EXTRA_OUTPUT, currentPhotoPath);
@@ -132,6 +135,7 @@ public class ImageFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         System.out.println("requestCode : "+requestCode+" resultCode : "+resultCode);
+        // Activity가 끝나면 저장
         if(requestCode == 1 && resultCode != 0) {
             // 갤러리에 변경을 알려줌
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -148,10 +152,12 @@ public class ImageFragment extends Fragment {
             Toast.makeText(v.getContext().getApplicationContext(), "저장완료", Toast.LENGTH_LONG).show();
         }
 
+        // 왠진 모르겠는데 이거 해야 깨진 사진이 하나 더 생기는 오류가 안 생김
         File file = new File(currentPhotoPath);
         file.delete();
 
         if(requestCode == 1 && resultCode != 0) {
+            // 갤러리 새로고침
             startGallery();
         }
     }
