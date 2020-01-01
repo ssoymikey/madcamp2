@@ -65,16 +65,16 @@ public class PenSetting extends Dialog {
         mLeftButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "취소",
-                        Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), "취소",
+                //        Toast.LENGTH_SHORT).show();
                 dismiss();
             }
         });
         mRightButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "두께" + mThicknessBar.getProgress() ,
-                        Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), "두께" + mThicknessBar.getProgress() ,
+                //        Toast.LENGTH_SHORT).show();
                 onPenSettingEventListener.penSettingEvent(mThicknessBar.getProgress());
                 // width 값 setting 하기
                 dismiss();

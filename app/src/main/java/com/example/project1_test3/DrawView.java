@@ -45,7 +45,8 @@ public class DrawView extends View  {
 
     private ArrayList<Point> arrP = new ArrayList<>();
     private ArrayList<Point> undoArrP = new ArrayList<>();
-    int color;
+    int mColor;
+    float mWidth;
 
     public DrawView(Context context) {
         super(context);
@@ -68,10 +69,12 @@ public class DrawView extends View  {
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
         mPaint.setColor(DEFAULT_COLOR);
+        mColor = DEFAULT_COLOR;
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(DEFAULT_STROKE_WIDTH);
+        mWidth = DEFAULT_STROKE_WIDTH;
         mCanvas = new Canvas();
     }
 
@@ -88,9 +91,9 @@ public class DrawView extends View  {
     }
 
 
-
     @Override
     protected void onDraw(Canvas canvas) {
+        setColor(mColor, mWidth);
 
         if (mBitmap != null) {
             canvas.drawBitmap(mBitmap, 0, 0, null);
@@ -132,6 +135,7 @@ public class DrawView extends View  {
                 mPath.lineTo(mX, mY);
                 mCanvas.drawPath(mPath, mPaint);
                 arrP.add(new Point (mPath, mPaint));
+                //Toast.makeText(getContext(), "arrP add: " + arrP.size(), Toast.LENGTH_SHORT).show();
                 // paths.add(mPath);
                 mPath = new Path();
                 invalidate();
@@ -145,7 +149,10 @@ public class DrawView extends View  {
         if(arrP.size() > 0) {
             undoArrP.add(arrP.remove(arrP.size()-1));
             invalidate();
-        } else {}
+            //Toast.makeText(getContext(), "arrP: " + arrP.size() + " undoArrP: " + undoArrP.size(), Toast.LENGTH_SHORT).show();
+        } else {
+            //Toast.makeText(getContext(), "arrP: " + arrP.size() + " undoArrP: " + undoArrP.size(), Toast.LENGTH_SHORT).show();
+        }
         /*
         if (paths.size()>0) {
             undonePaths.add(paths.remove(paths.size()-1));
@@ -158,8 +165,9 @@ public class DrawView extends View  {
         if(undoArrP.size()>0) {
             arrP.add(undoArrP.remove(undoArrP.size()-1));
             invalidate();
+            //Toast.makeText(getContext(), "arrP: " + arrP.size() + " undoArrP: " + undoArrP.size(), Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getContext(), "undoarrp: " + undoArrP.size(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), "arrP: " + arrP.size() + " undoArrP: " + undoArrP.size(), Toast.LENGTH_SHORT).show();
         }
         /*
         if (undonePaths.size()>0){
@@ -170,6 +178,7 @@ public class DrawView extends View  {
     }
 
     public void setSize(float width) {
+        mWidth = width;
         mPaint.setStrokeWidth(width);
         invalidate();
     }
@@ -178,6 +187,8 @@ public class DrawView extends View  {
     public void setColor(int color, float width) {
         init();
         //       mPaint = new Paint();
+        mColor = color;
+        mWidth = width;
         mPaint.setColor(color);
         //     mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(width);
@@ -199,6 +210,8 @@ public class DrawView extends View  {
     public void setWidth(int color, float width) {
         init();
         //       mPaint = new Paint();
+        mColor = color;
+        mWidth = width;
         mPaint.setColor(color);
         mPaint.setStrokeWidth(width);
         //      mPaint.setStyle(Paint.Style.STROKE);

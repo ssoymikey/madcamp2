@@ -1,15 +1,11 @@
 package com.example.project1_test3.Fragment;
 
-import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 
@@ -19,7 +15,6 @@ import androidx.fragment.app.Fragment;
 import com.example.project1_test3.DrawView;
 import com.example.project1_test3.PenSetting;
 import com.example.project1_test3.R;
-import com.example.project1_test3.ShapeSetting;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
 
@@ -27,7 +22,6 @@ public class MemoFragment extends Fragment implements View.OnClickListener {
 
     private DrawView drawView;
     Button btnColor;
-    ImageButton btnShape;
     Button btnSize;
     int tColor, n = 0;
     int color =0;
@@ -42,7 +36,6 @@ public class MemoFragment extends Fragment implements View.OnClickListener {
 
         btnColor = v.findViewById(R.id.btnColor);
         btnSize = v.findViewById(R.id.btnSize);
-        btnShape = v.findViewById(R.id.btnShape);
         ImageButton btnUndo = v.findViewById(R.id.btnUndo);
         ImageButton btnRedo = v.findViewById(R.id.btnRedo);
         ImageButton btnErase = v.findViewById(R.id.btnErase);
@@ -50,7 +43,6 @@ public class MemoFragment extends Fragment implements View.OnClickListener {
 
         btnColor.setOnClickListener(this);
         btnSize.setOnClickListener(this);
-        btnShape.setOnClickListener(this);
         btnUndo.setOnClickListener(this);
         btnRedo.setOnClickListener(this);
         btnErase.setOnClickListener(this);
@@ -69,14 +61,12 @@ public class MemoFragment extends Fragment implements View.OnClickListener {
             case R.id.btnSize:
                 openSizeChange();
                 break;
-            case R.id.btnShape:
-                openShape();
-                break;
             case R.id.btnUndo:
                 drawView.onClickUndo();
                 break;
             case R.id.btnRedo:
                 drawView.onClickRedo();
+                break;
             case R.id.btnErase:
                 drawView.reset();
                 //두께 두껍게..?
@@ -84,7 +74,6 @@ public class MemoFragment extends Fragment implements View.OnClickListener {
             case R.id.btnSave:
                 drawView.save(view.getContext());
                 break;
-
         }
     }
 
@@ -129,11 +118,6 @@ public class MemoFragment extends Fragment implements View.OnClickListener {
         });
 
         penSetting.show();
-    }
-
-    public void openShape() {
-        ShapeSetting shapeSetting = new ShapeSetting(v.getContext());
-        shapeSetting.show();
     }
 
     public int getColor() {

@@ -166,8 +166,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
         ContentProviderOperation.Builder op;
 
         //ContentProviderOperation.Builder op = ContentProviderOperation.newUpdate(ContactsContract.RawContacts.CONTENT_URI)
-          //      .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
-            //    .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null);
+        //      .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+        //    .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null);
         //ops.add(op.build());
 
         op = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
