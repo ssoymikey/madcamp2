@@ -48,6 +48,9 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
 
     private ArrayList<Dictionary> mList;
     private Context mContext;
+    static int count = -1;
+    static String userName;
+    static String userNumber;
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
         protected ImageView photo;
@@ -82,6 +85,9 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
 
                     editTextPHONE.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
 
+                    userName = getUserInfo(mList.get(getAdapterPosition()));
+                    userNumber = mList.get(getAdapterPosition()).getUser_phNumber();
+
                     final AlertDialog dialog = builder.create();
                     ButtonSubmit.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -97,7 +103,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
                             notifyItemChanged(getAdapterPosition());
                             dialog.dismiss();
 
-                            updateContact3(mContext.getContentResolver(), mList.get(getAdapterPosition()), mList.get(getAdapterPosition()).getPersonId());
+                            updateContact2(mContext, mContext.getContentResolver(), mList.get(getAdapterPosition()), userName);
+                            //updateContact3(mContext.getContentResolver(), mList.get(getAdapterPosition()), userName, userNumber);
                         }
                     });
 
@@ -113,31 +120,55 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
         contactHelper.delete(ContactsContract.RawContacts.CONTENT_URI, where, null);
     }
 
-    private static void updateContact2(ContentResolver contactHelper, Dictionary dictionary, long getContactId) {
-        String where = ContactsContract.RawContacts.CONTACT_ID + " = " + getContactId;
-        ContentValues values = new ContentValues();
-        System.out.println("name: " + dictionary.getUser_Name());
-        System.out.println("getContactId : " + getContactId);
-        values.put(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, dictionary.getUser_Name());
-        values.put(ContactsContract.CommonDataKinds.Phone.NUMBER, dictionary.getUser_phNumber());
-        contactHelper.update(ContactsContract.Data.CONTENT_URI, values, where, null);
+    private static String getUserInfo(Dictionary dictionary) {
+        return dictionary.getUser_Name();
+
     }
 
-    private static void updateContact3(ContentResolver contactHelper, Dictionary dictionary, long getContactId) {
-        String where = ContactsContract.RawContacts.CONTACT_ID + " = " + getContactId;
-        String selectPhone = ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + getContactId;
-        String selectName = ContactsContract.CommonDataKinds.StructuredName.CONTACT_ID + " = " +getContactId;
-        String nameWhere = ContactsContract.Data.CONTACT_ID + " = " + getContactId + " AND " + ContactsContract.Data.MIMETYPE + " = " + ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE;
-        String phoneWhere = ContactsContract.Data.CONTACT_ID + " = " + getContactId + " AND " + ContactsContract.Data.MIMETYPE + " = " + ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE;
-        String[] nameArgs = new String[] {String.valueOf(getContactId), String.valueOf(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)};
-        String[] phoneArgs = new String[] {String.valueOf(getContactId), String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)};
+    private static void updateContact2(Context context, ContentResolver contactHelper, Dictionary dictionary, String userName) {
+        Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        String[] projection = new String[] {
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                ContactsContract.RawContacts.CONTACT_ID
+        };
+
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null && cursor.getCount() > 0) {
+            for (cursor.moveToFirst(); !(cursor.isAfterLast()); cursor.moveToNext()) {
+                count++;
+                String getName = cursor.getString(0);
+                long getContactId = cursor.getLong(1);
+                if (getName.equals(userName)) {
+                    String where = ContactsContract.RawContacts.CONTACT_ID + " = " + getContactId;
+                    ContentValues values = new ContentValues();
+                    System.out.println("name: " + userName);
+                    System.out.println("getContactId : " + getContactId);
+                    values.put(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, dictionary.getUser_Name().substring(1));
+                    values.put(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME, dictionary.getUser_Name().substring(0, 1));
+                    //values.put(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, dictionary.getUser_Name());
+                    values.put(ContactsContract.CommonDataKinds.Phone.NUMBER, dictionary.getUser_phNumber());
+                    contactHelper.update(ContactsContract.Data.CONTENT_URI, values, where, null);
+                }
+            } cursor.close();
+        }
+    }
+
+    private static void updateContact3(ContentResolver contactHelper, Dictionary dictionary, String userName, String userNumber) {
+//        String where = ContactsContract.RawContacts.CONTACT_ID + " = " + getContactId;
+        String selectPhone = ContactsContract.CommonDataKinds.Phone.NUMBER + " = " + userNumber;
+        String selectName = ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME + " = " + userName;
+//        String nameWhere = ContactsContract.Data.CONTACT_ID + " = " + getContactId + " AND " + ContactsContract.Data.MIMETYPE + " = " + ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE;
+//        String phoneWhere = ContactsContract.Data.CONTACT_ID + " = " + getContactId + " AND " + ContactsContract.Data.MIMETYPE + " = " + ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE;
+//        String[] nameArgs = new String[] {String.valueOf(getContactId), String.valueOf(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)};
+//        String[] phoneArgs = new String[] {String.valueOf(getContactId), String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)};
+
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
         ContentProviderOperation.Builder op;
 
-//        ContentProviderOperation.Builder op = ContentProviderOperation.newUpdate(ContactsContract.RawContacts.CONTENT_URI)
-//                .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
-//                .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null);
-//        ops.add(op.build());
+        //ContentProviderOperation.Builder op = ContentProviderOperation.newUpdate(ContactsContract.RawContacts.CONTENT_URI)
+          //      .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+            //    .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null);
+        //ops.add(op.build());
 
         op = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
                 .withSelection(selectName, null)
@@ -153,7 +184,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
         ops.add(op.build());
 
         System.out.println("name: " + dictionary.getUser_Name());
-        System.out.println("getContactId : " + getContactId);
+        //System.out.println("getContactId : " + getContactId);
         System.out.println("display name : " + ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME);
         System.out.println("phoneNumber : " + dictionary.getUser_phNumber());
         Log.d(TAG, "Creating contact : " + dictionary.getUser_Name());

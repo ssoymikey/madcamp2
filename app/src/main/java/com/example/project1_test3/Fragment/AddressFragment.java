@@ -156,7 +156,7 @@ public class AddressFragment extends Fragment {
             ButtonSubmit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    long mid = mArrayList.get(position).getPersonId();
+                    String mid = mArrayList.get(position).getUser_Name();
                     System.out.println("mid 값 : " + mid);
                     deleteContact(v.getContext().getContentResolver(), mid);
 
@@ -175,11 +175,28 @@ public class AddressFragment extends Fragment {
         }
     };
 
-    private static void deleteContact(ContentResolver contactHelper, long getContactId) {
-        System.out.println("Contact ID : " + getContactId);
-        String where = ContactsContract.RawContacts.CONTACT_ID + " = " + getContactId;
-        System.out.println("where : " + where);
-        contactHelper.delete(ContactsContract.RawContacts.CONTENT_URI, where, null);
+    private void deleteContact(ContentResolver contactHelper, String name) {
+        Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        String[] projection = new String[] {
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                ContactsContract.RawContacts.CONTACT_ID
+        };
+
+
+        Cursor cursor = v.getContext().getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null && cursor.getCount() > 0) {
+            for (cursor.moveToFirst(); !(cursor.isAfterLast()); cursor.moveToNext()) {
+                count++;
+                String getName = cursor.getString(0);
+                long getContactId = cursor.getLong(1);
+                if (getName.equals(name)) {
+                    System.out.println("Contact ID : " + getContactId);
+                    String where = ContactsContract.RawContacts.CONTACT_ID + " = " + getContactId;
+                    contactHelper.delete(ContactsContract.RawContacts.CONTENT_URI, where, null);
+                    System.out.println("where : " + where);
+                }
+            } cursor.close();
+        }
     }
 
     public ArrayList<Dictionary> getDictionaryList() {
