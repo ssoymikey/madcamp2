@@ -25,6 +25,10 @@ public class PenSetting extends Dialog {
 
     private PenSettingEventListener onPenSettingEventListener;
 
+    public PenSetting() {
+        super(null);
+    }
+
     public PenSetting(Context context, PenSettingEventListener onPenSettingEventListener) {
         super(context);
         this.onPenSettingEventListener = onPenSettingEventListener;
