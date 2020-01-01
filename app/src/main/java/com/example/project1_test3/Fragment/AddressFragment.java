@@ -174,7 +174,8 @@ public class AddressFragment extends Fragment {
         String[] projection = new String[]{
                 ContactsContract.CommonDataKinds.Phone.NUMBER,
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                ContactsContract.RawContacts.CONTACT_ID
+                ContactsContract.RawContacts.CONTACT_ID,
+                ContactsContract.Contacts.PHOTO_ID
         };
         String[] selectionArgs = null;
         String sortOrder = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY + " asc";
@@ -185,11 +186,13 @@ public class AddressFragment extends Fragment {
             for (cursor.moveToFirst(); !(cursor.isAfterLast()); cursor.moveToNext()) {
                 count++;
                 long person = cursor.getLong(2);
+                long photo_id = cursor.getLong(3);
                 Dictionary dictionary = new Dictionary();
                 dictionary.setId(count + "");
                 dictionary.setUser_Name(cursor.getString(1));
                 dictionary.setUser_phNumber(cursor.getString(0));
                 dictionary.setPersonId(person);
+                dictionary.setPhotoId(photo_id);
 
                 if (dictionary.getUser_phNumber().startsWith("01")) {
                     mArrayList.add(dictionary);

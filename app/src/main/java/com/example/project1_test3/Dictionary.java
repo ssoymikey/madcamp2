@@ -1,11 +1,15 @@
 package com.example.project1_test3;
 
 public class Dictionary {
-    private long personId;
+    private long personId=0, photoId=0;
     private String id;
     private String user_phNumber, user_Name;
 
     public Dictionary() {}
+
+    public long getPhotoId() { return photoId; }
+
+    public void setPhotoId(long photoId) { this.photoId = photoId; }
 
     public long getPersonId() {
         return personId;

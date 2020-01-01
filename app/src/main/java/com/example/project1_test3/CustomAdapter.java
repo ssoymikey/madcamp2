@@ -7,13 +7,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
 import android.nfc.Tag;
+import android.os.Build;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.telephony.PhoneNumberFormattingTextWatcher;
@@ -30,7 +34,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
@@ -42,7 +50,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
     private Context mContext;
 
     public class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
-        protected ImageView id;
+        protected ImageView photo;
         protected TextView phoneNumber;
         protected TextView name;
         protected ImageButton callButton;
@@ -50,7 +58,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
 
         public CustomViewHolder(View view) {
             super(view);
-            this.id = view.findViewById(R.id.id_listitem);
+            this.photo = view.findViewById(R.id.id_listitem);
             this.phoneNumber = view.findViewById(R.id.phone_listitem);
             this.name = view.findViewById(R.id.name_listitem);
             this.callButton = view.findViewById(R.id.call_button);
@@ -303,11 +311,39 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
         viewholder.callButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mContext.checkSelfPermission(Manifest.permission.CALL_PHONE+"");
+                mContext.checkSelfPermission(Manifest.permission.CALL_PHONE + "");
                 Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + mList.get(pos).getUser_phNumber()));
                 mContext.startActivity(intent);
             }
         });
+
+        long photo_id = mList.get(position).getPhotoId();
+
+        if (photo_id != 0) {
+            //Uri uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, photo_id);
+            //System.out.println("Uri : " + uri);
+            //Glide.with(mContext).load(uri).placeholder(R.drawable.loading_image).override(120, 120).dontAnimate().into(viewholder.photo);
+            byte[] photoBytes = null;
+            Uri photoUri = ContentUris.withAppendedId(ContactsContract.Data.CONTENT_URI, photo_id);
+            Cursor c = mContext.getContentResolver().query(photoUri, new String[]{ContactsContract.CommonDataKinds.Photo.PHOTO},
+                    null,null, null);
+
+            try {
+                if(c.moveToFirst())
+                    photoBytes = c.getBlob(0);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                c.close();
+            }
+
+            viewholder.photo.setPadding(0,0,0,0);
+            viewholder.photo.setBackground(new ShapeDrawable(new OvalShape()));
+            if(Build.VERSION.SDK_INT >= 21) {
+                viewholder.photo.setClipToOutline(true);
+            }
+            Glide.with(mContext).load(photoBytes).placeholder(R.drawable.loading_image).override(120, 120).dontAnimate().into(viewholder.photo);
+        }
     }
 
     @Override
