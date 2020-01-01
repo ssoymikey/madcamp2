@@ -18,7 +18,7 @@ import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
-    private ViewPager viewPager;
+    private NonSwipeViewPager viewPager;
     private ContentsPagerAdapter mContentsPagerAdapter;
 
     @Override
@@ -55,12 +55,15 @@ public class MainActivity extends AppCompatActivity {
                 tabLayout.getTabAt(2).setIcon(R.drawable.paint_brushes);
                 switch (tab.getPosition()) {
                     case 0:
+                        viewPager.setEnable(true);
                         tabLayout.getTabAt(0).setIcon(R.drawable.stick_man_b);
                         break;
                     case 1:
+                        viewPager.setEnable(true);
                         tabLayout.getTabAt(1).setIcon(R.drawable.picture_b);
                         break;
                     case 2:
+                        viewPager.setEnable(false);
                         tabLayout.getTabAt(2).setIcon(R.drawable.paint_brushes_b);
                         break;
                 }

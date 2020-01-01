@@ -49,7 +49,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
     private ArrayList<Dictionary> mList;
     private Context mContext;
 
-    public class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+    public class CustomViewHolder extends RecyclerView.ViewHolder {
         protected ImageView photo;
         protected TextView phoneNumber;
         protected TextView name;
@@ -63,102 +63,49 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
             this.name = view.findViewById(R.id.name_listitem);
             this.callButton = view.findViewById(R.id.call_button);
 
-            view.setOnCreateContextMenuListener(this);
-        }
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final ImageButton ButtonSubmit;
+                    final EditText editTextNAME;
+                    final EditText editTextPHONE;
 
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            MenuItem Edit = menu.add(Menu.NONE, 1001, 1, "편집");
-            MenuItem Delete = menu.add(Menu.NONE, 1002, 2, "삭제");
-            Edit.setOnMenuItemClickListener(onEditMenu);
-            Delete.setOnMenuItemClickListener(onEditMenu);
-        }
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                    v = LayoutInflater.from(mContext).inflate(R.layout.edit_box, null, false);
+                    builder.setView(v);
+                    ButtonSubmit = v.findViewById(R.id.button_dialog_submit);
+                    editTextNAME = v.findViewById(R.id.edittext_dialog_name);
+                    editTextPHONE = v.findViewById(R.id.edittext_dialog_phone);
 
-        private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                View view;
-                final ImageButton ButtonSubmit;
-                final EditText editTextNAME;
-                final EditText editTextPHONE;
+                    editTextNAME.setText(mList.get(getAdapterPosition()).getUser_Name());
+                    editTextPHONE.setText(mList.get(getAdapterPosition()).getUser_phNumber());
 
-                switch (item.getItemId()) {
-                    case 1001:
-                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                        view = LayoutInflater.from(mContext).inflate(R.layout.edit_box, null, false);
-                        builder.setView(view);
-                        ButtonSubmit = view.findViewById(R.id.button_dialog_submit);
-                        editTextNAME = view.findViewById(R.id.edittext_dialog_name);
-                        editTextPHONE = view.findViewById(R.id.edittext_dialog_phone);
+                    editTextPHONE.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
 
-                        editTextNAME.setText(mList.get(getAdapterPosition()).getUser_Name());
-                        editTextPHONE.setText(mList.get(getAdapterPosition()).getUser_phNumber());
+                    final AlertDialog dialog = builder.create();
+                    ButtonSubmit.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String strID = mList.get(getAdapterPosition()).getId();
+                            String strNAME = editTextNAME.getText().toString();
+                            String strPHONE = editTextPHONE.getText().toString();
 
-                        editTextPHONE.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
+                            Dictionary dict = new Dictionary(mList.get(getAdapterPosition()).getPersonId(), strID, strNAME, strPHONE);
+                            System.out.println("dict의 personId : " + dict.getPersonId());
+                            mList.set(getAdapterPosition(), dict);
+                            System.out.println("mList personId : " + mList.get(getAdapterPosition()).getPersonId());
+                            notifyItemChanged(getAdapterPosition());
+                            dialog.dismiss();
 
-                        final AlertDialog dialog = builder.create();
-                        ButtonSubmit.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String strID = mList.get(getAdapterPosition()).getId();
-                                String strNAME = editTextNAME.getText().toString();
-                                String strPHONE = editTextPHONE.getText().toString();
+                            updateContact3(mContext.getContentResolver(), mList.get(getAdapterPosition()), mList.get(getAdapterPosition()).getPersonId());
+                        }
+                    });
 
-                                Dictionary dict = new Dictionary(mList.get(getAdapterPosition()).getPersonId(), strID, strNAME, strPHONE);
-                                System.out.println("dict의 personId : " + dict.getPersonId());
-                                mList.set(getAdapterPosition(), dict);
-                                System.out.println("mList personId : " + mList.get(getAdapterPosition()).getPersonId());
-                                notifyItemChanged(getAdapterPosition());
-                                dialog.dismiss();
-
-                                updateContact3(mContext.getContentResolver(), mList.get(getAdapterPosition()), mList.get(getAdapterPosition()).getPersonId());
-                            }
-                        });
-
-                        dialog.show();
-
-                        break;
-
-                    case 1002:
-                        AlertDialog.Builder del_builder = new AlertDialog.Builder(mContext);
-                        view = LayoutInflater.from(mContext).inflate(R.layout.delete_box, null, false);
-                        del_builder.setView(view);
-                        ButtonSubmit = view.findViewById(R.id.button_del);
-
-                        final AlertDialog del_dialog = del_builder.create();
-                        ButtonSubmit.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                long mid = mList.get(getAdapterPosition()).getPersonId();
-                                System.out.println("mid 값 : " + mid);
-                                deleteContact(mContext.getContentResolver(), mid);
-
-                                mList.remove(getAdapterPosition());
-                                notifyItemRemoved(getAdapterPosition());
-                                notifyItemRangeChanged(getAdapterPosition(), mList.size());
-
-                                del_dialog.dismiss();
-                            }
-                        });
-
-                        del_dialog.show();
-//                        long mid = mList.get(getAdapterPosition()).getPersonId();
-//                        System.out.println("mid 값 : " + mid);
-//                        deleteContact(mContext.getContentResolver(), mid);
-//
-//                        mList.remove(getAdapterPosition());
-//                        notifyItemRemoved(getAdapterPosition());
-//                        notifyItemRangeChanged(getAdapterPosition(), mList.size());
-
-                        break;
+                    dialog.show();
                 }
-                return true;
-
-
-            }
-        };
+            });
+        }
     }
-
 
     private static void deleteContact(ContentResolver contactHelper, long getContactId) {
         System.out.println("Contact ID : " + getContactId);
@@ -178,33 +125,37 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
 
     private static void updateContact3(ContentResolver contactHelper, Dictionary dictionary, long getContactId) {
         String where = ContactsContract.RawContacts.CONTACT_ID + " = " + getContactId;
+        String selectPhone = ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + getContactId;
+        String selectName = ContactsContract.CommonDataKinds.StructuredName.CONTACT_ID + " = " +getContactId;
         String nameWhere = ContactsContract.Data.CONTACT_ID + " = " + getContactId + " AND " + ContactsContract.Data.MIMETYPE + " = " + ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE;
         String phoneWhere = ContactsContract.Data.CONTACT_ID + " = " + getContactId + " AND " + ContactsContract.Data.MIMETYPE + " = " + ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE;
         String[] nameArgs = new String[] {String.valueOf(getContactId), String.valueOf(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)};
         String[] phoneArgs = new String[] {String.valueOf(getContactId), String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)};
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
-        ContentProviderOperation.Builder op = ContentProviderOperation.newUpdate(ContactsContract.RawContacts.CONTENT_URI)
-                .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
-                .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null);
-        ops.add(op.build());
-        op = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
-                .withSelection(where, null)
-                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
-                .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
-                .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, dictionary.getUser_Name());
+        ContentProviderOperation.Builder op;
 
-        ops.add(op.build());
+//        ContentProviderOperation.Builder op = ContentProviderOperation.newUpdate(ContactsContract.RawContacts.CONTENT_URI)
+//                .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+//                .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null);
+//        ops.add(op.build());
+
         op = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
-                .withSelection(where, null)
-                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
-                .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                .withSelection(selectName, null)
+                .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, dictionary.getUser_Name());
+        ops.add(op.build());
+
+        op = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
+                .withSelection(selectPhone, null)
                 .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, dictionary.getUser_phNumber())
                 .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);
+
+        op.withYieldAllowed(true);
         ops.add(op.build());
 
         System.out.println("name: " + dictionary.getUser_Name());
         System.out.println("getContactId : " + getContactId);
         System.out.println("display name : " + ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME);
+        System.out.println("phoneNumber : " + dictionary.getUser_phNumber());
         Log.d(TAG, "Creating contact : " + dictionary.getUser_Name());
         try {
             contactHelper.applyBatch(ContactsContract.AUTHORITY, ops);
@@ -343,6 +294,13 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
                 viewholder.photo.setClipToOutline(true);
             }
             Glide.with(mContext).load(photoBytes).placeholder(R.drawable.loading_image).override(120, 120).dontAnimate().into(viewholder.photo);
+        } else {
+            viewholder.photo.setPadding(15,15,15,15);
+            viewholder.photo.setBackground(null);
+            if(Build.VERSION.SDK_INT >= 21) {
+                viewholder.photo.setClipToOutline(true);
+            }
+            Glide.with(mContext).load(R.drawable.user_b).placeholder(R.drawable.loading_image).override(120, 120).dontAnimate().into(viewholder.photo);
         }
     }
 

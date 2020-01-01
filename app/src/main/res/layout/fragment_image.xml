@@ -3,6 +3,11 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/swipe_refresh_layout">
+
     <GridView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -11,6 +16,8 @@
         android:numColumns="auto_fit"
         android:gravity="center"
         android:stretchMode="columnWidth" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <TextView
         android:layout_width="match_parent"

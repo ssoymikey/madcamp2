@@ -3,7 +3,8 @@ package com.example.project1_test3;
 public class Dictionary {
     private long personId=0, photoId=0;
     private String id;
-    private String user_phNumber, user_Name;
+    private String user_phNumber;
+    private String user_Name;
 
     public Dictionary() {}
 

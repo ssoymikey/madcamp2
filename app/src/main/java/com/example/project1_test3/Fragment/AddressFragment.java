@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -23,6 +24,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.project1_test3.CustomAdapter;
 import com.example.project1_test3.Dictionary;
@@ -41,6 +43,18 @@ public class AddressFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_address, container, false);
+
+        final SwipeRefreshLayout swipeRefreshLayout = v.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mArrayList.clear();
+                mAdapter.notifyDataSetChanged();
+                getDictionaryList();
+
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
 
         RecyclerView mRecyclerView = v.findViewById(R.id.recyclerview_main_list);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(v.getContext());
@@ -61,7 +75,6 @@ public class AddressFragment extends Fragment {
 
         getDictionaryList();
         mAdapter.notifyDataSetChanged();
-
 
         ImageButton buttonInsert = v.findViewById(R.id.button_main_insert);
         buttonInsert.setOnClickListener(new View.OnClickListener() {
@@ -231,21 +244,27 @@ public class AddressFragment extends Fragment {
 
     public static boolean insertContact(ContentResolver contactHelper, String name, String phoneNumber) {
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
+        ContentProviderOperation.Builder op;
 
-        ops.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+        op = ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
                 .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
-                .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null).build());
+                .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null);
+        ops.add(op.build());
 
-        ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+        op = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
                 .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
                 .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
-                .withValue(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, name).build());
+                .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name);
+        ops.add(op.build());
 
-        ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+        op = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
                 .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
                 .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
                 .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, phoneNumber)
-                .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE).build());
+                .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);
+
+        op.withYieldAllowed(true);
+        ops.add(op.build());
 
         try {
             contactHelper.applyBatch(ContactsContract.AUTHORITY, ops);
