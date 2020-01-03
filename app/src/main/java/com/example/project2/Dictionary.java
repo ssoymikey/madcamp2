@@ -1,4 +1,4 @@
-package com.example.project1_test3;
+package com.example.project2;
 
 public class Dictionary {
     private long personId=0, photoId=0;

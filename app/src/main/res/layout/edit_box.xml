@@ -44,19 +44,13 @@
         app:layout_constraintTop_toBottomOf="@id/edittext_dialog_name"
         app:layout_constraintBottom_toTopOf="@id/button_dialog_submit"/>
 
-    <ImageButton
+    <Button
         style="@style/Widget.AppCompat.Button.Colored"
         android:id="@+id/button_dialog_submit"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:paddingVertical="10dp"
-        android:paddingHorizontal="10dp"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
         android:background="@drawable/rectangle_button"
-        android:src="@drawable/address_add"
+        android:text="추가"
         android:layout_marginTop="20dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

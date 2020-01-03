@@ -17,7 +17,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.example.project1_test3.NonSwipeViewPager
+    <androidx.viewpager.widget.ViewPager
         android:id="@+id/pager_content"
         android:layout_below="@id/appBar"
         android:layout_width="match_parent"

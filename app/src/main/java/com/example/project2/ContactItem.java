@@ -1,4 +1,4 @@
-package com.example.project1_test3;
+package com.example.project2;
 
 import java.io.Serializable;
 

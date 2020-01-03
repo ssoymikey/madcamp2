@@ -1,4 +1,4 @@
-package com.example.project1_test3.Adapter;
+package com.example.project2.Adapter;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -20,8 +20,8 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.project1_test3.ContactItem;
-import com.example.project1_test3.R;
+import com.example.project2.ContactItem;
+import com.example.project2.R;
 
 import java.io.InputStream;
 import java.util.ArrayList;

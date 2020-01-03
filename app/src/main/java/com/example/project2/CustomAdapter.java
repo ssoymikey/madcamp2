@@ -1,4 +1,4 @@
-package com.example.project1_test3;
+package com.example.project2;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -11,30 +11,23 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Build;
-import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -56,7 +49,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
         protected ImageView photo;
         protected TextView phoneNumber;
         protected TextView name;
-        protected ImageButton callButton;
+        protected Button callButton;
 
 
         public CustomViewHolder(View view) {
@@ -69,7 +62,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final ImageButton ButtonSubmit;
+                    final Button ButtonSubmit;
                     final EditText editTextNAME;
                     final EditText editTextPHONE;
 
@@ -114,12 +107,6 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
         }
     }
 
-    private static void deleteContact(ContentResolver contactHelper, long getContactId) {
-        System.out.println("Contact ID : " + getContactId);
-        String where = ContactsContract.RawContacts.CONTACT_ID + " = " + getContactId;
-        contactHelper.delete(ContactsContract.RawContacts.CONTENT_URI, where, null);
-    }
-
     private static String getUserInfo(Dictionary dictionary) {
         return dictionary.getUser_Name();
 
@@ -152,111 +139,6 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
             } cursor.close();
         }
     }
-
-    private static void updateContact3(ContentResolver contactHelper, Dictionary dictionary, String userName, String userNumber) {
-//        String where = ContactsContract.RawContacts.CONTACT_ID + " = " + getContactId;
-        String selectPhone = ContactsContract.CommonDataKinds.Phone.NUMBER + " = " + userNumber;
-        String selectName = ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME + " = " + userName;
-//        String nameWhere = ContactsContract.Data.CONTACT_ID + " = " + getContactId + " AND " + ContactsContract.Data.MIMETYPE + " = " + ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE;
-//        String phoneWhere = ContactsContract.Data.CONTACT_ID + " = " + getContactId + " AND " + ContactsContract.Data.MIMETYPE + " = " + ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE;
-//        String[] nameArgs = new String[] {String.valueOf(getContactId), String.valueOf(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)};
-//        String[] phoneArgs = new String[] {String.valueOf(getContactId), String.valueOf(ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)};
-
-        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
-        ContentProviderOperation.Builder op;
-
-        //ContentProviderOperation.Builder op = ContentProviderOperation.newUpdate(ContactsContract.RawContacts.CONTENT_URI)
-        //      .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
-        //    .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null);
-        //ops.add(op.build());
-
-        op = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
-                .withSelection(selectName, null)
-                .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, dictionary.getUser_Name());
-        ops.add(op.build());
-
-        op = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
-                .withSelection(selectPhone, null)
-                .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, dictionary.getUser_phNumber())
-                .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);
-
-        op.withYieldAllowed(true);
-        ops.add(op.build());
-
-        System.out.println("name: " + dictionary.getUser_Name());
-        //System.out.println("getContactId : " + getContactId);
-        System.out.println("display name : " + ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME);
-        System.out.println("phoneNumber : " + dictionary.getUser_phNumber());
-        Log.d(TAG, "Creating contact : " + dictionary.getUser_Name());
-        try {
-            contactHelper.applyBatch(ContactsContract.AUTHORITY, ops);
-        } catch (Exception e) {
-            Log.e(TAG, "Exception encountered while updating contact: " + e);
-        }
-
-    }
-
-    private static void updateContact4(ContentResolver contactHelper, Dictionary dictionary, long getContactId) {
-        String where = ContactsContract.RawContacts.CONTACT_ID + " = " + getContactId;
-        String nameWhere = ContactsContract.Data.CONTACT_ID + " = " + getContactId + " AND " + ContactsContract.Data.MIMETYPE + " = " + ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE;
-        String phoneWhere = ContactsContract.Data.CONTACT_ID + " = " + getContactId + " AND " + ContactsContract.Data.MIMETYPE + " = " + ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE;
-        String[] nameArgs = new String[] {String.valueOf(getContactId), String.valueOf(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)};
-        String[] phoneArgs = new String[] {String.valueOf(getContactId), String.valueOf(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)};
-        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
-        ops.add(ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
-                .withSelection(where, null)
-                .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, dictionary.getUser_Name()).build());
-        ops.add(ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
-                .withSelection(where, null)
-                .withValue(ContactsContract.CommonDataKinds.Phone.DATA, dictionary.getUser_phNumber()).build());
-
-        Log.d(TAG, "Creating contact : " + dictionary.getUser_Name());
-        try {
-            contactHelper.applyBatch(ContactsContract.AUTHORITY, ops);
-        } catch (Exception e) {
-            Log.e(TAG, "Exception encountered while updating contact: " + e);
-        }
-
-    }
-
-    private static void updateContactName(ContentResolver contactHelper, String name, long getContactId) {
-        String where = ContactsContract.RawContacts.CONTACT_ID + " = " + getContactId;
-        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
-        ops.add(ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
-                .withSelection(where, null)
-                .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name).build());
-
-        Log.d(TAG, "Creating contact : " + name);
-        try {
-            contactHelper.applyBatch(ContactsContract.AUTHORITY, ops);
-        } catch (Exception e) {
-            Log.e(TAG, "Exception encountered while updating contact: " + e);
-        }
-    }
-
-    private static void updateContactPhone(ContentResolver contactHelper, String phone, long getContactId) {
-        String where = ContactsContract.RawContacts.CONTACT_ID + " = " + getContactId;
-        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
-
-        ops.add(ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI)
-                .withSelection(where, null)
-                .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, phone).build());
-
-        Log.d(TAG, "Creating contact number : " + phone);
-        try {
-            contactHelper.applyBatch(ContactsContract.AUTHORITY, ops);
-        } catch (Exception e) {
-            Log.e(TAG, "Exception encountered while updating contact: " + e);
-        }
-    }
-
-
-
-//    public CustomAdapter(ArrayList<Dictionary> list) {
-//        this.mList = list;
-//    }
-
-
 
     @Override
     public CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {

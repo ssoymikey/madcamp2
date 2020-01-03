@@ -1,110 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <RelativeLayout
-        android:id="@+id/ll_menu"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="5dp" >
-
-        <Button
-            android:id="@+id/btnColor"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="5dp"
-            android:layout_toLeftOf="@id/btnSize"
-            android:background="@drawable/colorpick_btn" />
-
-        <Button
-            android:id="@+id/btnSize"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="5dp"
-            android:layout_toLeftOf="@id/btnUndo"
-            android:adjustViewBounds="true"
-            android:padding="10dp"
-            android:scaleType="fitCenter"
-            android:background="@drawable/round_button_green"
-            android:text="3"
-            android:textColor="#ffffff"/>
-
-
-        <ImageButton
-            android:id="@+id/btnUndo"
-            android:layout_gravity="center"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="5dp"
-            android:layout_toLeftOf="@id/btnRedo"
-            android:adjustViewBounds="true"
-            android:padding="10dp"
-            android:scaleType="fitCenter"
-            android:background="@drawable/round_button_green"
-            android:src="@drawable/undo_btn"/>
-
-        <ImageButton
-            android:id="@+id/btnRedo"
-            android:layout_gravity="center"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="5dp"
-            android:layout_centerInParent="true"
-            android:adjustViewBounds="true"
-            android:padding="10dp"
-            android:scaleType="fitCenter"
-            android:background="@drawable/round_button_green"
-            android:src="@drawable/redo_btn"/>
-
-        <ImageButton
-            android:id="@+id/btnNot"
-            android:layout_gravity="center"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="5dp"
-            android:layout_toRightOf="@id/btnRedo"
-            android:adjustViewBounds="true"
-            android:padding="10dp"
-            android:scaleType="fitCenter"
-            android:background="@drawable/round_button_white" />
-
-        <ImageButton
-            android:id="@+id/btnErase"
-            android:layout_gravity="center"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="5dp"
-            android:layout_toRightOf="@id/btnNot"
-            android:adjustViewBounds="true"
-            android:padding="10dp"
-            android:scaleType="fitCenter"
-            android:background="@drawable/round_button"
-            android:src="@drawable/erase_btn"/>
-
-        <ImageButton
-            android:id="@+id/btnSave"
-            android:layout_gravity="center"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="5dp"
-            android:layout_toRightOf="@id/btnErase"
-            android:adjustViewBounds="true"
-            android:padding="10dp"
-            android:scaleType="fitCenter"
-            android:background="@drawable/round_button"
-            android:src="@drawable/save_btn"/>
-
-
-    </RelativeLayout>
-
-    <com.example.project1_test3.DrawView
-        android:id="@+id/sub_layout"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical" >
-    </com.example.project1_test3.DrawView>
+        android:text="3번 탭"
+        android:textAlignment="center"/>
 
-</LinearLayout>
+</RelativeLayout>

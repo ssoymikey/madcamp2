@@ -1,12 +1,12 @@
-package com.example.project1_test3.Adapter;
+package com.example.project2.Adapter;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
-import com.example.project1_test3.Fragment.AddressFragment;
-import com.example.project1_test3.Fragment.ImageFragment;
-import com.example.project1_test3.Fragment.MemoFragment;
+import com.example.project2.Fragment.AddressFragment;
+import com.example.project2.Fragment.ImageFragment;
+import com.example.project2.Fragment.MemoFragment;
 
 public class ContentsPagerAdapter extends FragmentStatePagerAdapter {
     private int tabCount;

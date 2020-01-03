@@ -1,4 +1,4 @@
-package com.example.project1_test3.Fragment;
+package com.example.project2.Fragment;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
@@ -12,11 +12,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -27,11 +24,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.project1_test3.CustomAdapter;
-import com.example.project1_test3.Dictionary;
-import com.example.project1_test3.MainActivity;
-import com.example.project1_test3.Permission;
-import com.example.project1_test3.R;
+import com.example.project2.CustomAdapter;
+import com.example.project2.Dictionary;
+import com.example.project2.R;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -43,7 +38,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class AddressFragment extends Fragment {
-    private ArrayList<com.example.project1_test3.Dictionary> mArrayList;
+    private ArrayList<Dictionary> mArrayList;
     private CustomAdapter mAdapter;
     private int count = -1;
 
@@ -84,7 +79,7 @@ public class AddressFragment extends Fragment {
         getDictionaryList();
         mAdapter.notifyDataSetChanged();
 
-        ImageButton buttonInsert = v.findViewById(R.id.button_main_insert);
+        Button buttonInsert = v.findViewById(R.id.button_main_insert);
         buttonInsert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,7 +87,7 @@ public class AddressFragment extends Fragment {
                 View view = LayoutInflater.from(v.getContext()).inflate(R.layout.edit_box, null, false);
                 builder.setView(view);
 
-                final ImageButton ButtonSubmit = view.findViewById(R.id.button_dialog_submit);
+                final Button ButtonSubmit = view.findViewById(R.id.button_dialog_submit);
                 final EditText editTextNAME = view.findViewById(R.id.edittext_dialog_name);
                 final EditText editTextPHONE = view.findViewById(R.id.edittext_dialog_phone);
 
@@ -179,18 +174,11 @@ public class AddressFragment extends Fragment {
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
             final int position = viewHolder.getAdapterPosition();
-//            System.out.println("position : " + position);
-//            System.out.println("mArrayList index : " + mArrayList.get(position).getUser_Name());
-//
-//            deleteContact(v.getContext().getContentResolver(), mArrayList.get(position).getPersonId());
-//
-//            mArrayList.remove(position);
-//            mAdapter.notifyItemRemoved(position);
 
             AlertDialog.Builder del_builder = new AlertDialog.Builder(v.getContext());
             v = LayoutInflater.from(v.getContext()).inflate(R.layout.delete_box, null, false);
             del_builder.setView(v);
-            final ImageButton ButtonSubmit = v.findViewById(R.id.button_del);
+            final Button ButtonSubmit = v.findViewById(R.id.button_del);
 
             final AlertDialog del_dialog = del_builder.create();
             ButtonSubmit.setOnClickListener(new View.OnClickListener() {
@@ -270,22 +258,7 @@ public class AddressFragment extends Fragment {
                             ", personId = " + dictionary.getPersonId());
                 }
             }
-            /*
-            do {
-                count++;
-                long person = cursor.getLong(2);
-                Dictionary dictionary = new Dictionary();
-                dictionary.setId(count+"");
-                dictionary.setUser_Name(cursor.getString(1));
-                dictionary.setUser_phNumber(cursor.getString(0));
-                dictionary.setPersonId(person);
 
-                if(dictionary.getUser_phNumber().startsWith("01")) {
-                    mArrayList.add(dictionary);
-                    Log.d("<<CONTACTS", "name=" + dictionary.getUser_Name() + ", phone = " + dictionary.getUser_phNumber() + ", id = " + dictionary.getId() +
-                            ", personId = " + dictionary.getPersonId());
-                }
-            } while(cursor.moveToNext());*/
             cursor.close();
         }
         return mArrayList;
@@ -331,40 +304,4 @@ public class AddressFragment extends Fragment {
         }
         return true;
     }
-
-    public static void deleteContact(ContentResolver contactHelper, int adapterPosition) {
-        String where = ContactsContract.RawContacts.CONTACT_ID + " = " + adapterPosition;
-        contactHelper.delete(ContactsContract.RawContacts.CONTENT_URI, where, null);
-    }
-
-    /*
-    public static boolean saveContact(ContentResolver contactHelper, String name, String phoneNumber) {
-        ContentValues cv = new ContentValues();
-        cv.put(ContactsContract.RawContacts.CONTACT_ID, 0);
-        cv.put(ContactsContract.RawContacts.AGGREGATION_MODE, ContactsContract.RawContacts.AGGREGATION_MODE_DISABLED);
-        Uri rawContactUri = contactHelper.insert(ContactsContract.RawContacts.CONTENT_URI, cv);
-        long rawContactId = ContentUris.parseId(rawContactUri);
-
-        try {
-            cv.clear();
-            cv.put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId);
-            cv.put(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
-            cv.put(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);
-            cv.put(ContactsContract.CommonDataKinds.Phone.NUMBER, phoneNumber);
-            Uri dataUri = contactHelper.insert(ContactsContract.Data.CONTENT_URI, cv);
-
-            cv.clear();
-            cv.put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId);
-            cv.put(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
-            cv.put(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name);
-            dataUri = contactHelper.insert(ContactsContract.Data.CONTENT_URI, cv);
-        } catch (Exception e) {
-            Log.e("ContactSaver : ", "Exception" + e);
-            return false;
-        }
-        return true;
-    }*/
-
-
-
 }
