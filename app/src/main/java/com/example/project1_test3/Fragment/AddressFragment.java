@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -32,6 +33,13 @@ import com.example.project1_test3.MainActivity;
 import com.example.project1_test3.Permission;
 import com.example.project1_test3.R;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class AddressFragment extends Fragment {
@@ -124,6 +132,38 @@ public class AddressFragment extends Fragment {
                     }
                 });
                 dialog.show();
+            }
+        });
+
+        final Button serverBtn = v.findViewById(R.id.serverbutton);
+        serverBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread(){
+                    @Override
+                    public void run() {
+                        try {
+                            URL url = new URL("http://192.249.19.251:880/");
+                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                            connection.setRequestMethod("GET"); //전송방식
+                            connection.setDoOutput(true);       //데이터를 쓸 지 설정
+                            connection.setDoInput(true);        //데이터를 읽어올지 설정
+
+                            InputStream is = connection.getInputStream();
+                            StringBuilder sb = new StringBuilder();
+                            BufferedReader br = new BufferedReader(new InputStreamReader(is,"UTF-8"));
+                            String result;
+                            while((result = br.readLine())!=null){
+                                sb.append(result+"\n");
+                            }
+
+                        } catch (MalformedURLException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
             }
         });
 

@@ -19,7 +19,8 @@ public class Permission {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_CONTACTS,
             Manifest.permission.WRITE_CONTACTS, // 주소록 액세스 권한
-            Manifest.permission.CALL_PHONE
+            Manifest.permission.CALL_PHONE,
+            Manifest.permission.INTERNET
     };
     private static final int MULTIPLE_PERMISSIONS = 101;
 
