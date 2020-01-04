@@ -29,10 +29,13 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.project2.Fragment.AddressFragment;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import static android.content.ContentValues.TAG;
 
@@ -41,20 +44,15 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
 
     private ArrayList<Dictionary> mList;
     private Context mContext;
-    static int count = -1;
-    static String userName;
-    static String userNumber;
+    static long userID;
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
-        protected ImageView photo;
         protected TextView phoneNumber;
         protected TextView name;
         protected Button callButton;
 
-
         public CustomViewHolder(View view) {
             super(view);
-            this.photo = view.findViewById(R.id.id_listitem);
             this.phoneNumber = view.findViewById(R.id.phone_listitem);
             this.name = view.findViewById(R.id.name_listitem);
             this.callButton = view.findViewById(R.id.call_button);
@@ -78,25 +76,37 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
 
                     editTextPHONE.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
 
-                    userName = getUserInfo(mList.get(getAdapterPosition()));
-                    userNumber = mList.get(getAdapterPosition()).getUser_phNumber();
+                    userID = mList.get(getAdapterPosition()).getPersonId();
 
                     final AlertDialog dialog = builder.create();
                     ButtonSubmit.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            String strID = mList.get(getAdapterPosition()).getId();
                             String strNAME = editTextNAME.getText().toString();
                             String strPHONE = editTextPHONE.getText().toString();
 
-                            Dictionary dict = new Dictionary(mList.get(getAdapterPosition()).getPersonId(), strID, strNAME, strPHONE);
+                            Dictionary dict = new Dictionary(mList.get(getAdapterPosition()).getPersonId(), strNAME, strPHONE);
                             System.out.println("dict의 personId : " + dict.getPersonId());
                             mList.set(getAdapterPosition(), dict);
+
+                            ArrayList<Dictionary> tempList = new ArrayList<>();
+                            tempList.add(dict);
+                            String json = AddressFragment.makeJSONString(tempList);
+                            SetContactsAsyncTask task = new SetContactsAsyncTask("PUT", "http://192.249.19.251:980/contactedit");
+                            try {
+                                boolean success = task.execute(json).get();
+                                Toast.makeText(v.getContext(), "PUT to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            } catch (ExecutionException e) {
+                                e.printStackTrace();
+                            }
+
                             System.out.println("mList personId : " + mList.get(getAdapterPosition()).getPersonId());
                             notifyItemChanged(getAdapterPosition());
                             dialog.dismiss();
 
-                            updateContact2(mContext, mContext.getContentResolver(), mList.get(getAdapterPosition()), userName);
+                            updateContact2(mContext, mContext.getContentResolver(), mList.get(getAdapterPosition()), userID);
                             //updateContact3(mContext.getContentResolver(), mList.get(getAdapterPosition()), userName, userNumber);
                         }
                     });
@@ -107,12 +117,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
         }
     }
 
-    private static String getUserInfo(Dictionary dictionary) {
-        return dictionary.getUser_Name();
-
-    }
-
-    private static void updateContact2(Context context, ContentResolver contactHelper, Dictionary dictionary, String userName) {
+    private static void updateContact2(Context context, ContentResolver contactHelper, Dictionary dictionary, long userID) {
         Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
         String[] projection = new String[] {
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
@@ -122,17 +127,15 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
         if (cursor != null && cursor.getCount() > 0) {
             for (cursor.moveToFirst(); !(cursor.isAfterLast()); cursor.moveToNext()) {
-                count++;
                 String getName = cursor.getString(0);
                 long getContactId = cursor.getLong(1);
-                if (getName.equals(userName)) {
+                if (getContactId == userID) {
                     String where = ContactsContract.RawContacts.CONTACT_ID + " = " + getContactId;
                     ContentValues values = new ContentValues();
-                    System.out.println("name: " + userName);
+                    System.out.println("name: " + getName);
                     System.out.println("getContactId : " + getContactId);
                     values.put(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, dictionary.getUser_Name().substring(1));
                     values.put(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME, dictionary.getUser_Name().substring(0, 1));
-                    //values.put(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, dictionary.getUser_Name());
                     values.put(ContactsContract.CommonDataKinds.Phone.NUMBER, dictionary.getUser_phNumber());
                     contactHelper.update(ContactsContract.Data.CONTENT_URI, values, where, null);
                 }
@@ -156,9 +159,6 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
         mContext = context;
     }
 
-
-
-
     @Override
     public void onBindViewHolder(@NonNull CustomViewHolder viewholder, int position) {
         final int pos = position;
@@ -180,41 +180,6 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
                 mContext.startActivity(intent);
             }
         });
-
-        long photo_id = mList.get(position).getPhotoId();
-
-        if (photo_id != 0) {
-            //Uri uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, photo_id);
-            //System.out.println("Uri : " + uri);
-            //Glide.with(mContext).load(uri).placeholder(R.drawable.loading_image).override(120, 120).dontAnimate().into(viewholder.photo);
-            byte[] photoBytes = null;
-            Uri photoUri = ContentUris.withAppendedId(ContactsContract.Data.CONTENT_URI, photo_id);
-            Cursor c = mContext.getContentResolver().query(photoUri, new String[]{ContactsContract.CommonDataKinds.Photo.PHOTO},
-                    null,null, null);
-
-            try {
-                if(c.moveToFirst())
-                    photoBytes = c.getBlob(0);
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                c.close();
-            }
-
-            viewholder.photo.setPadding(0,0,0,0);
-            viewholder.photo.setBackground(new ShapeDrawable(new OvalShape()));
-            if(Build.VERSION.SDK_INT >= 21) {
-                viewholder.photo.setClipToOutline(true);
-            }
-            Glide.with(mContext).load(photoBytes).placeholder(R.drawable.loading_image).override(120, 120).dontAnimate().into(viewholder.photo);
-        } else {
-            viewholder.photo.setPadding(15,15,15,15);
-            viewholder.photo.setBackground(null);
-            if(Build.VERSION.SDK_INT >= 21) {
-                viewholder.photo.setClipToOutline(true);
-            }
-            Glide.with(mContext).load(R.drawable.user_b).placeholder(R.drawable.loading_image).override(120, 120).dontAnimate().into(viewholder.photo);
-        }
     }
 
     @Override

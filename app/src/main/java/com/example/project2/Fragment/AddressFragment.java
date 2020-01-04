@@ -2,7 +2,6 @@ package com.example.project2.Fragment;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -26,7 +26,13 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.project2.CustomAdapter;
 import com.example.project2.Dictionary;
+import com.example.project2.GetContactsAsyncTask;
 import com.example.project2.R;
+import com.example.project2.SetContactsAsyncTask;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,28 +42,16 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class AddressFragment extends Fragment {
     private ArrayList<Dictionary> mArrayList;
     private CustomAdapter mAdapter;
-    private int count = -1;
 
     private View v;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_address, container, false);
-
-        final SwipeRefreshLayout swipeRefreshLayout = v.findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mArrayList.clear();
-                mAdapter.notifyDataSetChanged();
-                getDictionaryList();
-
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
 
         RecyclerView mRecyclerView = v.findViewById(R.id.recyclerview_main_list);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(v.getContext());
@@ -75,9 +69,22 @@ public class AddressFragment extends Fragment {
                 mLinearLayoutManager.getOrientation());
         mRecyclerView.addItemDecoration(dividerItemDecoration);
 
-
-        getDictionaryList();
+        //getDictionaryList();
+        loadContectFromServer(v);
         mAdapter.notifyDataSetChanged();
+
+        final SwipeRefreshLayout swipeRefreshLayout = v.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mArrayList.clear();
+                //getDictionaryList();
+                loadContectFromServer(v);
+                mAdapter.notifyDataSetChanged();
+
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
 
         Button buttonInsert = v.findViewById(R.id.button_main_insert);
         buttonInsert.setOnClickListener(new View.OnClickListener() {
@@ -96,30 +103,38 @@ public class AddressFragment extends Fragment {
                 final AlertDialog dialog = builder.create();
 
                 // 3. 다이얼로그에 있는 삽입 버튼을 클릭하면
-
                 ButtonSubmit.setOnClickListener(new View.OnClickListener() {
 
                     public void onClick(View v) {
 
-
                         // 4. 사용자가 입력한 내용을 가져와서
-                        String strID = ((count+1) +"").toString();
                         String strName = editTextNAME.getText().toString();
                         String strPhone = editTextPHONE.getText().toString();
 
                         insertContact(v.getContext().getContentResolver(), strName, strPhone);
                         //saveContact(getContentResolver(), strName, strPhone);
-
+                        long id = findIDbyPhone(strPhone);
 
                         // 5. ArrayList에 추가하고
-
-                        Dictionary dict = new Dictionary(strID, strName, strPhone);
+                        Dictionary dict = new Dictionary(id, strName, strPhone);
                         //mArrayList.add(0, dict); //첫번째 줄에 삽입됨
                         mArrayList.add(dict); //마지막 줄에 삽입됨
 
+                        // 서버에 삽입된 contact 전송하고
+                        ArrayList<Dictionary> tempList = new ArrayList<>();
+                        tempList.add(dict);
+                        String json = makeJSONString(tempList);
+                        SetContactsAsyncTask task = new SetContactsAsyncTask("PUT", "http://192.249.19.251:980/contact");
+                        try {
+                            boolean success = task.execute(json).get();
+                            Toast.makeText(v.getContext(), "PUT to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
 
                         // 6. 어댑터에서 RecyclerView에 반영하도록 합니다.
-
                         //mAdapter.notifyItemInserted(0);
                         mAdapter.notifyDataSetChanged();
 
@@ -130,35 +145,55 @@ public class AddressFragment extends Fragment {
             }
         });
 
+        // 동기화 버튼
         final Button serverBtn = v.findViewById(R.id.serverbutton);
         serverBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Thread(){
-                    @Override
-                    public void run() {
-                        try {
-                            URL url = new URL("http://192.249.19.251:880/");
-                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                            connection.setRequestMethod("GET"); //전송방식
-                            connection.setDoOutput(true);       //데이터를 쓸 지 설정
-                            connection.setDoInput(true);        //데이터를 읽어올지 설정
+                String json;
 
-                            InputStream is = connection.getInputStream();
-                            StringBuilder sb = new StringBuilder();
-                            BufferedReader br = new BufferedReader(new InputStreamReader(is,"UTF-8"));
-                            String result;
-                            while((result = br.readLine())!=null){
-                                sb.append(result+"\n");
-                            }
+//                new Thread(){
+//                    @Override
+//                    public void run() {
+//                        try {
+//                            URL url = new URL("http://192.249.19.251:980/");
+//                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//                            connection.setRequestMethod("GET"); //전송방식
+//                            connection.setDoOutput(true);       //데이터를 쓸 지 설정
+//                            connection.setDoInput(true);        //데이터를 읽어올지 설정
+//
+//                            InputStream is = connection.getInputStream();
+//                            StringBuilder sb = new StringBuilder();
+//                            BufferedReader br = new BufferedReader(new InputStreamReader(is,"UTF-8"));
+//                            String result;
+//                            while((result = br.readLine())!=null) {
+//                                sb.append(result + "\n");
+//                            }
+//
+//                            serverBtn.setText(sb.toString());
+//
+//                        } catch (MalformedURLException e) {
+//                            e.printStackTrace();
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }.start();
 
-                        } catch (MalformedURLException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }.start();
+                mArrayList.clear();
+                json = getDictionaryListServer();
+
+                SetContactsAsyncTask task = new SetContactsAsyncTask("POST", "http://192.249.19.251:980/contact");
+                try {
+                    boolean success = task.execute(json).get();
+                    Toast.makeText(v.getContext(), "POST to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+                mAdapter.notifyDataSetChanged();
             }
         });
 
@@ -184,7 +219,23 @@ public class AddressFragment extends Fragment {
             ButtonSubmit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String mid = mArrayList.get(position).getUser_Name();
+                    long mid = mArrayList.get(position).getPersonId();
+
+                    ArrayList<Dictionary> tempList = new ArrayList<>();
+                    tempList.add(mArrayList.get(position));
+
+                    // 삭제 정보 서버에 보내기
+                    String json = makeJSONString(tempList);
+                    SetContactsAsyncTask task = new SetContactsAsyncTask("DELETE", "http://192.249.19.251:980/contact");
+                    try {
+                        boolean success = task.execute(json).get();
+                        Toast.makeText(v.getContext(), "DELETE to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+
                     System.out.println("mid 값 : " + mid);
                     deleteContact(v.getContext().getContentResolver(), mid);
 
@@ -203,27 +254,25 @@ public class AddressFragment extends Fragment {
         }
     };
 
-    private void deleteContact(ContentResolver contactHelper, String name) {
-        Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-        String[] projection = new String[] {
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                ContactsContract.RawContacts.CONTACT_ID
-        };
+    public void loadContectFromServer(View v){
+        GetContactsAsyncTask task = new GetContactsAsyncTask();
+        try {
+            mArrayList.clear();
+            System.out.println("load start");
+            ArrayList<Dictionary> returnValues = task.execute().get();
+            System.out.println("load end");
 
+            for(int i=0;i<returnValues.size();i++) {
+                Dictionary FetchedData = returnValues.get(i);
+                mArrayList.add(FetchedData);
+            }
 
-        Cursor cursor = v.getContext().getContentResolver().query(uri, projection, null, null, null);
-        if (cursor != null && cursor.getCount() > 0) {
-            for (cursor.moveToFirst(); !(cursor.isAfterLast()); cursor.moveToNext()) {
-                count++;
-                String getName = cursor.getString(0);
-                long getContactId = cursor.getLong(1);
-                if (getName.equals(name)) {
-                    System.out.println("Contact ID : " + getContactId);
-                    String where = ContactsContract.RawContacts.CONTACT_ID + " = " + getContactId;
-                    contactHelper.delete(ContactsContract.RawContacts.CONTENT_URI, where, null);
-                    System.out.println("where : " + where);
-                }
-            } cursor.close();
+            Toast.makeText(v.getContext(), "Fetched from MongoDB!!", Toast.LENGTH_SHORT).show();
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
         }
     }
 
@@ -233,7 +282,6 @@ public class AddressFragment extends Fragment {
                 ContactsContract.CommonDataKinds.Phone.NUMBER,
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
                 ContactsContract.RawContacts.CONTACT_ID,
-                ContactsContract.Contacts.PHOTO_ID
         };
         String[] selectionArgs = null;
         String sortOrder = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY + " asc";
@@ -242,20 +290,15 @@ public class AddressFragment extends Fragment {
 
         if (cursor != null && cursor.getCount() > 0) {
             for (cursor.moveToFirst(); !(cursor.isAfterLast()); cursor.moveToNext()) {
-                count++;
                 long person = cursor.getLong(2);
-                long photo_id = cursor.getLong(3);
                 Dictionary dictionary = new Dictionary();
-                dictionary.setId(count + "");
                 dictionary.setUser_Name(cursor.getString(1));
                 dictionary.setUser_phNumber(cursor.getString(0));
                 dictionary.setPersonId(person);
-                dictionary.setPhotoId(photo_id);
 
                 if (dictionary.getUser_phNumber().startsWith("01")) {
                     mArrayList.add(dictionary);
-                    Log.d("<<CONTACTS", "name=" + dictionary.getUser_Name() + ", phone = " + dictionary.getUser_phNumber() + ", id = " + dictionary.getId() +
-                            ", personId = " + dictionary.getPersonId());
+                    Log.d("<<CONTACTS", "name=" + dictionary.getUser_Name() + ", phone = " + dictionary.getUser_phNumber() + ", personId = " + dictionary.getPersonId());
                 }
             }
 
@@ -264,13 +307,73 @@ public class AddressFragment extends Fragment {
         return mArrayList;
     }
 
-    public static void insertContact2(ContentResolver contactHelper, String name, String phoneNumber) {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, name);
-        contentValues.put(ContactsContract.CommonDataKinds.Phone.NUMBER, phoneNumber);
+    public String getDictionaryListServer() {
+        Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        String[] projection = new String[]{
+                ContactsContract.CommonDataKinds.Phone.NUMBER,
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                ContactsContract.RawContacts.CONTACT_ID,
+        };
+        String[] selectionArgs = null;
+        String sortOrder = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY + " asc";
+        String json = new String();
 
-        contactHelper.insert(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, contentValues);
+        Cursor cursor = v.getContext().getContentResolver().query(uri, projection, null, selectionArgs, sortOrder);
+
+        if (cursor != null && cursor.getCount() > 0) {
+            for (cursor.moveToFirst(); !(cursor.isAfterLast()); cursor.moveToNext()) {
+                long person = cursor.getLong(2);
+                Dictionary dictionary = new Dictionary();
+                dictionary.setUser_Name(cursor.getString(1));
+                dictionary.setUser_phNumber(cursor.getString(0));
+                dictionary.setPersonId(person);
+
+                if (dictionary.getUser_phNumber().startsWith("01")) {
+                    mArrayList.add(dictionary);
+                    Log.d("<<CONTACTS", "name=" + dictionary.getUser_Name() + ", phone = " + dictionary.getUser_phNumber() + ", personId = " + dictionary.getPersonId());
+                }
+            }
+            json = makeJSONString(mArrayList);
+            cursor.close();
+        }
+        return json;
     }
+
+    public static String makeJSONString(ArrayList<Dictionary> dicArr) {
+        String json;
+        JSONArray arr = new JSONArray();
+        JSONObject univ = new JSONObject();
+        JSONObject jsDict;
+        Dictionary dictionary;
+
+        for(int i=0;i<dicArr.size();i++) {
+            dictionary = dicArr.get(i);
+            jsDict = new JSONObject();
+
+            try {
+                jsDict.put("personID", dictionary.getPersonId());
+                jsDict.put("name", dictionary.getUser_Name());
+                jsDict.put("phone", dictionary.getUser_phNumber());
+
+                arr.put(jsDict);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            univ.put("DB_Input", arr);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        json = univ.toString();
+
+        System.out.println(json);
+
+        return json;
+    }
+
 
     public static boolean insertContact(ContentResolver contactHelper, String name, String phoneNumber) {
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
@@ -296,6 +399,7 @@ public class AddressFragment extends Fragment {
         op.withYieldAllowed(true);
         ops.add(op.build());
 
+
         try {
             contactHelper.applyBatch(ContactsContract.AUTHORITY, ops);
         } catch (Exception e) {
@@ -303,5 +407,48 @@ public class AddressFragment extends Fragment {
             return false;
         }
         return true;
+    }
+
+    private void deleteContact(ContentResolver contactHelper, long id) {
+        Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        String[] projection = new String[] {
+                ContactsContract.RawContacts.CONTACT_ID
+        };
+
+        Cursor cursor = v.getContext().getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null && cursor.getCount() > 0) {
+            for (cursor.moveToFirst(); !(cursor.isAfterLast()); cursor.moveToNext()) {
+                long getContactId = cursor.getLong(0);
+                if (getContactId == id) {
+                    System.out.println("Contact ID : " + getContactId);
+                    String where = ContactsContract.RawContacts.CONTACT_ID + " = " + getContactId;
+                    contactHelper.delete(ContactsContract.RawContacts.CONTENT_URI, where, null);
+                    System.out.println("where : " + where);
+                }
+            } cursor.close();
+        }
+    }
+
+    private long findIDbyPhone(String phone) {
+        Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        String[] projection = new String[] {
+                ContactsContract.CommonDataKinds.Phone.NUMBER,
+                ContactsContract.RawContacts.CONTACT_ID,
+        };
+        long result = -1;
+
+        Cursor cursor = v.getContext().getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null && cursor.getCount() > 0) {
+            for (cursor.moveToFirst(); !(cursor.isAfterLast()); cursor.moveToNext()) {
+                String getPhone = cursor.getString(0);
+                long getContactId = cursor.getLong(1);
+                if (getPhone.equals(phone)) {
+                    System.out.println("Contact ID : " + getContactId);
+                    result = getContactId;
+                }
+            } cursor.close();
+        }
+
+        return result;
     }
 }

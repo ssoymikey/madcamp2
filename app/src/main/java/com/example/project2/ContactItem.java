@@ -55,4 +55,3 @@ public class ContactItem implements Serializable {
         return false;
     }
 }
-
