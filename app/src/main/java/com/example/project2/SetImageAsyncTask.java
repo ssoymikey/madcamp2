@@ -35,42 +35,6 @@ public class SetImageAsyncTask extends AsyncTask<String, Void, Boolean> {
         String output;
         int imageSize = 0;
 
-//        try {
-//            File file = new File(filename);
-//            FileInputStream fileInputStream = new FileInputStream(file);
-//
-//            bytesAvailable = fileInputStream.available();
-//            //System.out.println("avail : "+bytesAvailable);
-//
-//            bufferSize = Math.min(bytesAvailable, maxBufferSize);
-//            buffer = new byte[bufferSize];
-//            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-//            //System.out.println("read : "+bytesRead);
-//            //System.out.println("buffer : "+buffer.toString());
-//
-//            while (bytesRead > 0) {
-////                filedata += new String(buffer);
-////                //System.out.println("data : "+filedata);
-////                bytesAvailable = fileInputStream.available();
-////                //System.out.println("avail : "+bytesAvailable);
-////                bufferSize = Math.min(bytesAvailable, maxBufferSize);
-////                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-////            }
-////        } catch (Exception e) {
-////            e.printStackTrace();
-////        }
-//
-//        jsFile = new JSONObject();
-//
-//        try {
-//            jsFile.put("filename", filename);
-//            jsFile.put("filedata", filedata);
-//        } catch (
-//        JSONException e) {
-//            e.printStackTrace();
-//        }
-//        output = jsFile.toString();
-//        System.out.println(output);
 
         HttpURLConnection connection = null;
 

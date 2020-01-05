@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="rent_place">
+        <item>아름관</item>
+        <item>N1</item>
+        <item>카이마루</item>
+    </string-array>
+</resources>

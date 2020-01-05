@@ -77,7 +77,7 @@ public class ImageFragment extends Fragment {
             @Override
             public void onRefresh() {
                 //startGallery();
-                showGetImage();
+                //showGetImage();
 
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -241,23 +241,23 @@ public class ImageFragment extends Fragment {
         });
     }
 
-    public void showGetImage() {
-        ArrayList<String> result = new ArrayList<String>();
-
-        GetImageAsyncTask task = new GetImageAsyncTask();
-        try {
-            result = task.execute().get();
-            Toast.makeText(v.getContext(), "POST to MongoDB!! : ", Toast.LENGTH_SHORT).show();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        serverAdapter = new MyServerAdapter(v.getContext(), R.layout.row, basePath, result);
-        gridView = (GridView) v.findViewById(R.id.gridview);
-        gridView.setAdapter(serverAdapter);
-    }
+//    public void showGetImage() {
+//        ArrayList<String> result = new ArrayList<String>();
+//
+//        GetImageAsyncTask task = new GetImageAsyncTask();
+//        try {
+//            result = task.execute().get();
+//            Toast.makeText(v.getContext(), "POST to MongoDB!! : ", Toast.LENGTH_SHORT).show();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        } catch (ExecutionException e) {
+//            e.printStackTrace();
+//        }
+//
+//        serverAdapter = new MyServerAdapter(v.getContext(), R.layout.row, basePath, result);
+//        gridView = (GridView) v.findViewById(R.id.gridview);
+//        gridView.setAdapter(serverAdapter);
+//    }
 }
 
 class MyAdapter extends BaseAdapter {

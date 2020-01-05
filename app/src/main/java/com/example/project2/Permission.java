@@ -20,7 +20,9 @@ public class Permission {
             Manifest.permission.READ_CONTACTS,
             Manifest.permission.WRITE_CONTACTS, // 주소록 액세스 권한
             Manifest.permission.CALL_PHONE,
-            Manifest.permission.INTERNET
+            Manifest.permission.INTERNET,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
     };
     private static final int MULTIPLE_PERMISSIONS = 101;
 
