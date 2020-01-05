@@ -32,14 +32,23 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
+import com.example.project2.GetImageAsyncTask;
 import com.example.project2.R;
+import com.example.project2.SetContactsAsyncTask;
+import com.example.project2.SetImageAsyncTask;
 import com.github.chrisbanes.photoview.PhotoView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
 
 public class ImageFragment extends Fragment {
 
@@ -47,6 +56,7 @@ public class ImageFragment extends Fragment {
     private String basePath;
     private String mBasePath;
     private MyAdapter adapter;
+    private MyServerAdapter serverAdapter;
     private String[] mImgs;
 
     private String TAG = "Gallery : ";
@@ -66,7 +76,8 @@ public class ImageFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                startGallery();
+                //startGallery();
+                showGetImage();
 
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -137,11 +148,12 @@ public class ImageFragment extends Fragment {
                 //context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + Environment.getExternalStorageDirectory())));
                 v.getContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + mBasePath)));
             }
-            Toast.makeText(v.getContext().getApplicationContext(), "저장완료", Toast.LENGTH_LONG).show();
+            Toast.makeText(v.getContext().getApplicationContext(), "저장완료 : "+currentPhotoPath, Toast.LENGTH_LONG).show();
         }
 
         // 왠진 모르겠는데 이거 해야 깨진 사진이 하나 더 생기는 오류가 안 생김
         File file = new File(currentPhotoPath);
+        System.out.println(currentPhotoPath);
         file.delete();
 
         if(requestCode == 1 && resultCode != 0) {
@@ -186,26 +198,65 @@ public class ImageFragment extends Fragment {
         gridView.setAdapter(adapter);
 
         // gridView에 있는 이미지 눌렀을 때 확대해서 보여주기. dialog 팝업 이용
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(final AdapterView<?> parent, View view, int position, long id) { // 선택되었을 때 콜백메서드
-                dialog = new Dialog(v.getContext(), android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
-                //dialog.setContentView(R.layout.activity_image_popup);
-                dialog.setContentView(R.layout.slider);
+//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            public void onItemClick(final AdapterView<?> parent, View view, int position, long id) { // 선택되었을 때 콜백메서드
+//                dialog = new Dialog(v.getContext(), android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+//                //dialog.setContentView(R.layout.activity_image_popup);
+//                dialog.setContentView(R.layout.slider);
+//
+////                ImageView iv = (ImageView) dialog.findViewById(R.id.imageView);
+////                Glide.with(v.getContext()).load(adapter.getFilePath(position)).placeholder(R.drawable.loading_image).dontAnimate().into(iv);
+//
+//                // 팝업으로 viewPager를 띄우기 때문에 좌우 스크롤 가능
+//                sliderAdapter = new SliderAdapter(v.getContext(), R.layout.activity_image_popup, basePath, mImgs);
+//                viewPager = (ViewPager) dialog.findViewById(R.id.view);
+//                viewPager.setAdapter(sliderAdapter);
+//                viewPager.setCurrentItem(position);
+//
+//                dialog.show();
+//                Window window = dialog.getWindow();
+//                dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND, WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+//            }
+//        });
 
-//                ImageView iv = (ImageView) dialog.findViewById(R.id.imageView);
-//                Glide.with(v.getContext()).load(adapter.getFilePath(position)).placeholder(R.drawable.loading_image).dontAnimate().into(iv);
+        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            String filename;
 
-                // 팝업으로 viewPager를 띄우기 때문에 좌우 스크롤 가능
-                sliderAdapter = new SliderAdapter(v.getContext(), R.layout.activity_image_popup, basePath, mImgs);
-                viewPager = (ViewPager) dialog.findViewById(R.id.view);
-                viewPager.setAdapter(sliderAdapter);
-                viewPager.setCurrentItem(position);
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                filename = adapter.getFilePath(position);
 
-                dialog.show();
-                Window window = dialog.getWindow();
-                dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND, WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                SetImageAsyncTask task = new SetImageAsyncTask("POST", "http://192.249.19.251:980/gallery");
+                try {
+                    boolean success = task.execute(filename).get();
+                    Toast.makeText(v.getContext(), "POST to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+                return true;
             }
         });
+    }
+
+    public void showGetImage() {
+        ArrayList<String> result = new ArrayList<String>();
+
+        GetImageAsyncTask task = new GetImageAsyncTask();
+        try {
+            result = task.execute().get();
+            Toast.makeText(v.getContext(), "POST to MongoDB!! : ", Toast.LENGTH_SHORT).show();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        serverAdapter = new MyServerAdapter(v.getContext(), R.layout.row, basePath, result);
+        gridView = (GridView) v.findViewById(R.id.gridview);
+        gridView.setAdapter(serverAdapter);
     }
 }
 
@@ -260,6 +311,56 @@ class MyAdapter extends BaseAdapter {
 
     public String getFilePath(int position) {
         return mBasePath + File.separator + mImgs[position];
+    }
+}
+
+class MyServerAdapter extends BaseAdapter {
+    String mBasePath; // CustomGalleryAdapter를 선언할 때 지정 경로를 받아오기 위한 변수
+    Context mContext; // CustomGalleryAdapter를 선언할 때 해당 activity의 context를 받아오기 위한 context 변수
+    ArrayList<String> mImgs; // 위 mBasePath내의 file list를 String 배열로 저장받을 변수
+    Bitmap bm; // 지정 경로의 사진을 Bitmap으로 받아오기 위한 변수
+    int layout;
+
+    public MyServerAdapter(Context context, int layout, String basePath, ArrayList<String> mImgs) {
+        this.mContext = context;
+        this.mImgs = mImgs;
+        this.mBasePath = basePath;
+        this.layout = layout;
+    }
+
+    @Override
+    public int getCount() { // 보여줄 데이터의 총 개수 - 꼭 작성해야 함
+        if(mImgs == null)
+            return 0;
+
+        return mImgs.size();
+    }
+
+    @Override
+    public Object getItem(int position) { // 해당행의 데이터- 안해도 됨
+        return position;
+    }
+
+    @Override
+    public long getItemId(int position) { // 해당행의 유니크한 id - 안해도 됨
+        return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        final ImageView iv;
+        if (convertView == null) {
+            LayoutInflater inf = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inf.inflate(layout, null);
+            iv = (ImageView) convertView.findViewById(R.id.imageView);
+        } else {
+            iv = (ImageView) convertView.findViewById(R.id.imageView);
+        }
+
+        // Glide 라이브러리 너무 좋음. 이미지 잘 불러옴. 썸네일 불러오기
+        Glide.with(mContext).load(mImgs.get(position).getBytes()).override(300,300).centerCrop().into(iv);
+
+        return convertView;
     }
 }
 

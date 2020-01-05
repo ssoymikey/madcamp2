@@ -57,6 +57,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
             this.name = view.findViewById(R.id.name_listitem);
             this.callButton = view.findViewById(R.id.call_button);
 
+            /*
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -107,13 +108,13 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
                             dialog.dismiss();
 
                             updateContact2(mContext, mContext.getContentResolver(), mList.get(getAdapterPosition()), userID);
-                            //updateContact3(mContext.getContentResolver(), mList.get(getAdapterPosition()), userName, userNumber);
                         }
                     });
 
                     dialog.show();
                 }
             });
+            */
         }
     }
 

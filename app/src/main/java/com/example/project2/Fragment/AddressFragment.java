@@ -77,7 +77,7 @@ public class AddressFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mArrayList.clear();
+                //mArrayList.clear();
                 //getDictionaryList();
                 loadContectFromServer(v);
                 mAdapter.notifyDataSetChanged();
@@ -118,7 +118,7 @@ public class AddressFragment extends Fragment {
                         // 5. ArrayList에 추가하고
                         Dictionary dict = new Dictionary(id, strName, strPhone);
                         //mArrayList.add(0, dict); //첫번째 줄에 삽입됨
-                        mArrayList.add(dict); //마지막 줄에 삽입됨
+                        //mArrayList.add(dict); //마지막 줄에 삽입됨
 
                         // 서버에 삽입된 contact 전송하고
                         ArrayList<Dictionary> tempList = new ArrayList<>();
@@ -135,6 +135,8 @@ public class AddressFragment extends Fragment {
                         }
 
                         // 6. 어댑터에서 RecyclerView에 반영하도록 합니다.
+                        loadContectFromServer(v);
+
                         //mAdapter.notifyItemInserted(0);
                         mAdapter.notifyDataSetChanged();
 
@@ -152,36 +154,8 @@ public class AddressFragment extends Fragment {
             public void onClick(View v) {
                 String json;
 
-//                new Thread(){
-//                    @Override
-//                    public void run() {
-//                        try {
-//                            URL url = new URL("http://192.249.19.251:980/");
-//                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//                            connection.setRequestMethod("GET"); //전송방식
-//                            connection.setDoOutput(true);       //데이터를 쓸 지 설정
-//                            connection.setDoInput(true);        //데이터를 읽어올지 설정
-//
-//                            InputStream is = connection.getInputStream();
-//                            StringBuilder sb = new StringBuilder();
-//                            BufferedReader br = new BufferedReader(new InputStreamReader(is,"UTF-8"));
-//                            String result;
-//                            while((result = br.readLine())!=null) {
-//                                sb.append(result + "\n");
-//                            }
-//
-//                            serverBtn.setText(sb.toString());
-//
-//                        } catch (MalformedURLException e) {
-//                            e.printStackTrace();
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }.start();
-
                 mArrayList.clear();
-                json = getDictionaryListServer();
+                json = getDictionaryListJson();
 
                 SetContactsAsyncTask task = new SetContactsAsyncTask("POST", "http://192.249.19.251:980/contact");
                 try {
@@ -239,10 +213,11 @@ public class AddressFragment extends Fragment {
                     System.out.println("mid 값 : " + mid);
                     deleteContact(v.getContext().getContentResolver(), mid);
 
-                    mArrayList.remove(position);
-                    mAdapter.notifyItemRemoved(position);
+                    //mArrayList.remove(position);
+                    //mAdapter.notifyItemRemoved(position);
 
                     del_dialog.dismiss();
+                    loadContectFromServer(v);
 
                     mAdapter.notifyDataSetChanged();
                 }
@@ -276,38 +251,7 @@ public class AddressFragment extends Fragment {
         }
     }
 
-    public ArrayList<Dictionary> getDictionaryList() {
-        Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-        String[] projection = new String[]{
-                ContactsContract.CommonDataKinds.Phone.NUMBER,
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                ContactsContract.RawContacts.CONTACT_ID,
-        };
-        String[] selectionArgs = null;
-        String sortOrder = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY + " asc";
-
-        Cursor cursor = v.getContext().getContentResolver().query(uri, projection, null, selectionArgs, sortOrder);
-
-        if (cursor != null && cursor.getCount() > 0) {
-            for (cursor.moveToFirst(); !(cursor.isAfterLast()); cursor.moveToNext()) {
-                long person = cursor.getLong(2);
-                Dictionary dictionary = new Dictionary();
-                dictionary.setUser_Name(cursor.getString(1));
-                dictionary.setUser_phNumber(cursor.getString(0));
-                dictionary.setPersonId(person);
-
-                if (dictionary.getUser_phNumber().startsWith("01")) {
-                    mArrayList.add(dictionary);
-                    Log.d("<<CONTACTS", "name=" + dictionary.getUser_Name() + ", phone = " + dictionary.getUser_phNumber() + ", personId = " + dictionary.getPersonId());
-                }
-            }
-
-            cursor.close();
-        }
-        return mArrayList;
-    }
-
-    public String getDictionaryListServer() {
+    public String getDictionaryListJson() {
         Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
         String[] projection = new String[]{
                 ContactsContract.CommonDataKinds.Phone.NUMBER,
