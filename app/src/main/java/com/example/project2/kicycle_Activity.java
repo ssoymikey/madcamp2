@@ -1,6 +1,7 @@
 package com.example.project2;
 
 import android.content.Context;
+import android.icu.text.Transliterator;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,42 +44,8 @@ public class kicycle_Activity extends AppCompatActivity {
     SupportMapFragment mapFragment;
     GoogleMap map;
     MarkerOptions myLocationMarker;
+    //String [] rent_place = {"아름관", "창의관", "카이마루"};
 
-
-    public static String makeJSONString(ArrayList<Dictionary> dicArr) {
-        String json;
-        JSONArray arr = new JSONArray();
-        JSONObject univ = new JSONObject();
-        JSONObject jsDict;
-        Dictionary dictionary;
-
-        for(int i=0;i<dicArr.size();i++) {
-            dictionary = dicArr.get(i);
-            jsDict = new JSONObject();
-
-            try {
-                jsDict.put("personID", dictionary.getPersonId());
-                jsDict.put("name", dictionary.getUser_Name());
-                jsDict.put("phone", dictionary.getUser_phNumber());
-
-                arr.put(jsDict);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            univ.put("DB_Input", arr);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        json = univ.toString();
-
-        System.out.println(json);
-
-        return json;
-    }
 
 //    JSONObject rent_place =
 //            {"place" :[
@@ -105,15 +73,72 @@ public class kicycle_Activity extends AppCompatActivity {
                 final Button register_submit = view.findViewById(R.id.register_submit);
                 final EditText register_name = view.findViewById(R.id.register_name);
                 final EditText register_phone = view.findViewById(R.id.register_phone);
+                final EditText register_password = view.findViewById(R.id.register_password);
+                final Spinner startpoint = view.findViewById(R.id.register_startpoint);
+                final Spinner endpoint = view.findViewById(R.id.register_endpoint);
 
-                //register_phone.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
+                register_phone.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
 
                 final AlertDialog dialog = builder.create();
 
-                // 3. 다이얼로그에 있는 삽입 버튼을 클릭하면
+                final Object[] rentpoint_name = new Object[2];
+
+                startpoint.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        rentpoint_name[0] = parent.getItemAtPosition(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {}
+                });
+
+                endpoint.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        rentpoint_name[1] = parent.getItemAtPosition(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {}
+                });
+
+
+                //register submit button listner
                 register_submit.setOnClickListener(new View.OnClickListener() {
 
                     public void onClick(View v) {
+
+                        // 4. 사용자가 입력한 내용을 가져와서
+                        String strName = register_name.getText().toString();
+                        String strPhone = register_phone.getText().toString();
+                        String strPassword = register_password.getText().toString();
+                        String strStartpoint = rentpoint_name[0].toString();
+                        String strEndpoint = rentpoint_name[1].toString();
+
+                        JSONObject Registerinfo = new JSONObject();
+                        try {
+                            Registerinfo.put("name", strName);
+                            Registerinfo.put("phone", strPhone);
+                            Registerinfo.put("password", strPassword);
+                            Registerinfo.put("startpoint", strStartpoint);
+                            Registerinfo.put("endpoint", strEndpoint);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        // send to server
+                        String json = Registerinfo.toString();
+                        SetContactsAsyncTask task = new SetContactsAsyncTask("PUT", "http://192.249.19.251:980/register");
+                        try {
+                            boolean success = task.execute(json).get();
+                            Toast.makeText(v.getContext(), "PUT to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
 
                         dialog.dismiss();
                     }
@@ -236,6 +261,46 @@ public class kicycle_Activity extends AppCompatActivity {
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
         map.addMarker(myLocationMarker);
 
+        myLocationMarker.position(new LatLng(36.374369, 127.365635));
+        myLocationMarker.title("N1\n");
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        map.addMarker(myLocationMarker);
+
+        myLocationMarker.position(new LatLng(36.373482, 127.362643));
+        myLocationMarker.title("인사동\n");
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        map.addMarker(myLocationMarker);
+
+        myLocationMarker.position(new LatLng(36.371174, 127.357922));
+        myLocationMarker.title("노천극장\n");
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        map.addMarker(myLocationMarker);
+
+        myLocationMarker.position(new LatLng(36.368467, 127.362627));
+        myLocationMarker.title("오리연못\n");
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        map.addMarker(myLocationMarker);
+
+        myLocationMarker.position(new LatLng(36.369241, 127.365199));
+        myLocationMarker.title("E3\n");
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        map.addMarker(myLocationMarker);
+
+        myLocationMarker.position(new LatLng(36.366141, 127.363672));
+        myLocationMarker.title("정문\n");
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        map.addMarker(myLocationMarker);
+
+        myLocationMarker.position(new LatLng(36.364399, 127.358784));
+        myLocationMarker.title("쪽문\n");
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        map.addMarker(myLocationMarker);
+
+        myLocationMarker.position(new LatLng(36.368625, 127.356944));
+        myLocationMarker.title("희망관\n");
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        map.addMarker(myLocationMarker);
+
 
     }
 
@@ -256,5 +321,6 @@ public class kicycle_Activity extends AppCompatActivity {
             map.setMyLocationEnabled(true);
         }
     }
+
 
 }
