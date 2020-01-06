@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/kicycle_background">
@@ -9,7 +9,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginTop="130dp">
+        android:layout_marginTop="130dp"
+        android:id="@+id/first_layout">
 
         <Button
             android:id="@+id/register"
@@ -23,22 +24,47 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="USE"/>
-
-
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_alignTop="@id/first_layout"
+        android:id="@+id/second_layout"
+        android:layout_marginTop="40dp">
 
         <fragment
-            android:id = "@+id/map"
+            android:id="@+id/map"
             class="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="20dp"/>
-
+            android:layout_marginTop="20dp"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/third_layout"
+        android:background="@drawable/white_background"
+        android:visibility="invisible" >
 
-</LinearLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Back"
+            android:padding="10dp"
+            android:id="@+id/back_button" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview_main_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbarFadeDuration="0"
+            android:scrollbarSize="5dp"
+            android:scrollbarThumbVertical="@android:color/darker_gray"
+            android:scrollbars="vertical"/>
+    </LinearLayout>
+
+</RelativeLayout>

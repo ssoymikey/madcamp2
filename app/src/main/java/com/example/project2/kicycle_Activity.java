@@ -9,17 +9,24 @@ import android.os.Bundle;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -28,6 +35,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -38,22 +46,17 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import static com.example.project2.Fragment.AddressFragment.makeJSONString;
+import static java.security.AccessController.getContext;
 
-public class kicycle_Activity extends AppCompatActivity {
+public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnMarkerClickListener {
 
     SupportMapFragment mapFragment;
     GoogleMap map;
     MarkerOptions myLocationMarker;
-    //String [] rent_place = {"아름관", "창의관", "카이마루"};
-
-
-//    JSONObject rent_place =
-//            {"place" :[
-//                    {"name":"아름관", "location": [36.373986, 127.356660]},
-//                    {"name":"카이마루", "location": [36.373802, 127.359253]},
-//                    {"name":"창의관", "location": [36.370347, 127.362593]}
-//                    ]
-//            }
+    private ArrayList<Bicycle> mArrayList;
+    private BicycleAdapter mAdapter;
+    RecyclerView mRecyclerView;
+    LinearLayout bikeInfoLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -102,7 +105,6 @@ public class kicycle_Activity extends AppCompatActivity {
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {}
                 });
-
 
                 //register submit button listner
                 register_submit.setOnClickListener(new View.OnClickListener() {
@@ -163,6 +165,31 @@ public class kicycle_Activity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        Button backbutton = findViewById(R.id.back_button);
+        backbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bikeInfoLayout.setVisibility(View.INVISIBLE);
+                Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.alpha_reverse);
+                bikeInfoLayout.startAnimation(anim);
+            }
+        });
+
+        bikeInfoLayout = findViewById(R.id.third_layout);
+        mRecyclerView = findViewById(R.id.recyclerview_main_list);
+        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+
+        Bicycle temp = new Bicycle();
+        temp.setUser_Name("윤찬우");
+        temp.setUser_phNumber("010-2020-2020");
+
+        mArrayList = new ArrayList<Bicycle>();
+        mArrayList.add(temp);
+        mAdapter = new BicycleAdapter(getApplicationContext(), mArrayList);
+        mRecyclerView.setAdapter(mAdapter);
+
+        mAdapter.notifyDataSetChanged();
         requestMyLocation();
     }
 
@@ -184,21 +211,14 @@ public class kicycle_Activity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-                        }
+                        public void onStatusChanged(String provider, int status, Bundle extras) { }
 
                         @Override
-                        public void onProviderEnabled(String provider) {
-
-                        }
+                        public void onProviderEnabled(String provider) { }
 
                         @Override
-                        public void onProviderDisabled(String provider) {
-
-                        }
-                    }
-            );
+                        public void onProviderDisabled(String provider) { }
+                    });
 
             Location lastLocation = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (lastLocation != null) {
@@ -216,22 +236,14 @@ public class kicycle_Activity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-                        }
+                        public void onStatusChanged(String provider, int status, Bundle extras) { }
 
                         @Override
-                        public void onProviderEnabled(String provider) {
-
-                        }
+                        public void onProviderEnabled(String provider) { }
 
                         @Override
-                        public void onProviderDisabled(String provider) {
-
-                        }
-                    }
-            );
-
+                        public void onProviderDisabled(String provider) { }
+                    });
 
         } catch(SecurityException e) {
             e.printStackTrace();
@@ -241,67 +253,105 @@ public class kicycle_Activity extends AppCompatActivity {
     private void showCurrentLocation(Location location) {
         LatLng curPoint = new LatLng(location.getLatitude(), location.getLongitude());
 
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(curPoint, 15));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(curPoint, 16));
     }
 
     private void showRentPlaceMarker() {
         myLocationMarker = new MarkerOptions();
         myLocationMarker.position(new LatLng(36.373986, 127.356660));
-        myLocationMarker.title("아름관\n");
+        myLocationMarker.title("아름관");
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.370347, 127.362593));
-        myLocationMarker.title("창의관\n");
+        myLocationMarker.title("창의관");
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.373802, 127.359253));
-        myLocationMarker.title("카이마루\n");
+        myLocationMarker.title("카이마루");
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.374369, 127.365635));
-        myLocationMarker.title("N1\n");
+        myLocationMarker.title("N1");
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.373482, 127.362643));
-        myLocationMarker.title("인사동\n");
+        myLocationMarker.title("인사동");
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.371174, 127.357922));
-        myLocationMarker.title("노천극장\n");
+        myLocationMarker.title("노천극장");
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.368467, 127.362627));
-        myLocationMarker.title("오리연못\n");
+        myLocationMarker.title("오리연못");
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.369241, 127.365199));
-        myLocationMarker.title("E3\n");
+        myLocationMarker.title("E3");
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.366141, 127.363672));
-        myLocationMarker.title("정문\n");
+        myLocationMarker.title("정문");
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.364399, 127.358784));
-        myLocationMarker.title("쪽문\n");
+        myLocationMarker.title("쪽문");
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.368625, 127.356944));
-        myLocationMarker.title("희망관\n");
+        myLocationMarker.title("희망관");
         myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
         map.addMarker(myLocationMarker);
 
+        map.setOnMarkerClickListener(this);
+    }
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        mArrayList = getBikes(marker.getTitle());
+        for(int i=0;i<mArrayList.size();i++) {
+            System.out.println(mArrayList.get(i).getUser_Name());
+        }
+
+        mAdapter.notifyDataSetChanged();
+
+        bikeInfoLayout.setVisibility(View.VISIBLE);
+        Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.alpha);
+        bikeInfoLayout.startAnimation(anim);
+        map.moveCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+        marker.showInfoWindow();
+        //Toast.makeText(this, marker.getTitle() +" "+marker.getPosition(), Toast.LENGTH_SHORT).show();
+
+        mAdapter.addItem(mArrayList);
+        mAdapter.notifyDataSetChanged();
+
+        return true;
+    }
+
+    public ArrayList<Bicycle> getBikes(String start) {
+        ArrayList<Bicycle> bicycles = new ArrayList<Bicycle>();
+
+        GetBikeAsyncTask task = new GetBikeAsyncTask();
+        try {
+            bicycles = task.execute(start).get();
+            Toast.makeText(getApplicationContext(), "GET to MongoDB!!", Toast.LENGTH_SHORT).show();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return bicycles;
     }
 
     @Override
@@ -321,6 +371,4 @@ public class kicycle_Activity extends AppCompatActivity {
             map.setMyLocationEnabled(true);
         }
     }
-
-
 }
