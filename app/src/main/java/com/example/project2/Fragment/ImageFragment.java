@@ -4,12 +4,16 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager.widget.PagerAdapter;
@@ -45,6 +50,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -77,7 +83,7 @@ public class ImageFragment extends Fragment {
             @Override
             public void onRefresh() {
                 //startGallery();
-                //showGetImage();
+                showGetImage();
 
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -241,23 +247,26 @@ public class ImageFragment extends Fragment {
         });
     }
 
-//    public void showGetImage() {
-//        ArrayList<String> result = new ArrayList<String>();
-//
-//        GetImageAsyncTask task = new GetImageAsyncTask();
-//        try {
-//            result = task.execute().get();
-//            Toast.makeText(v.getContext(), "POST to MongoDB!! : ", Toast.LENGTH_SHORT).show();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
-//        }
-//
-//        serverAdapter = new MyServerAdapter(v.getContext(), R.layout.row, basePath, result);
-//        gridView = (GridView) v.findViewById(R.id.gridview);
-//        gridView.setAdapter(serverAdapter);
-//    }
+    public void showGetImage() {
+        ArrayList<String> images = new ArrayList<String>();
+        //String image = new String();
+
+        GetImageAsyncTask task = new GetImageAsyncTask();
+        try {
+            images = task.execute().get();
+            Toast.makeText(v.getContext(), "GET MongoDB!! : ", Toast.LENGTH_SHORT).show();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        //image = result.getBytes();
+
+        serverAdapter = new MyServerAdapter(v.getContext(), R.layout.row, basePath, images);
+        gridView = (GridView) v.findViewById(R.id.gridview);
+        gridView.setAdapter(serverAdapter);
+    }
 }
 
 class MyAdapter extends BaseAdapter {
@@ -318,6 +327,7 @@ class MyServerAdapter extends BaseAdapter {
     String mBasePath; // CustomGalleryAdapter를 선언할 때 지정 경로를 받아오기 위한 변수
     Context mContext; // CustomGalleryAdapter를 선언할 때 해당 activity의 context를 받아오기 위한 context 변수
     ArrayList<String> mImgs; // 위 mBasePath내의 file list를 String 배열로 저장받을 변수
+    //String mImgs;
     Bitmap bm; // 지정 경로의 사진을 Bitmap으로 받아오기 위한 변수
     int layout;
 
@@ -349,6 +359,7 @@ class MyServerAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final ImageView iv;
+        byte[] image;
         if (convertView == null) {
             LayoutInflater inf = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inf.inflate(layout, null);
@@ -357,8 +368,12 @@ class MyServerAdapter extends BaseAdapter {
             iv = (ImageView) convertView.findViewById(R.id.imageView);
         }
 
+        //System.out.println(mImgs.get(position));
+        image = Base64.decode(mImgs.get(position), Base64.DEFAULT);
+        //image = Base64.decode(mImgs, Base64.DEFAULT);
+
         // Glide 라이브러리 너무 좋음. 이미지 잘 불러옴. 썸네일 불러오기
-        Glide.with(mContext).load(mImgs.get(position).getBytes()).override(300,300).centerCrop().into(iv);
+        Glide.with(mContext).load(image).override(300,300).centerCrop().into(iv);
 
         return convertView;
     }

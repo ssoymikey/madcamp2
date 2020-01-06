@@ -12,20 +12,20 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class GetImageAsyncTask extends AsyncTask<Dictionary, Void, ArrayList<String>> {
+public class GetImageAsyncTask extends AsyncTask<Void, Void, ArrayList<String>> {
     static String server_output = null;
-    static String temp_output = null;
-    static ArrayList<String> result = new ArrayList<String>();
+    static ArrayList<String> images = new ArrayList<String>();
+    static String buffer;
 
     @Override
-    protected ArrayList<String> doInBackground(Dictionary... arg0) {
+    protected ArrayList<String> doInBackground(Void... arg0) {
         HttpURLConnection conn = null;
 
         try {
             URL url = new URL("http://192.249.19.251:980/gallery");
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
-            //conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestProperty("Accept", "application/json");
             conn.setDoInput(true);        //데이터를 읽어올지 설정
 
             if (conn.getResponseCode() != 200) {
@@ -48,18 +48,25 @@ public class GetImageAsyncTask extends AsyncTask<Dictionary, Void, ArrayList<Str
             //다시 byte array 로 변환하여 사용하려구 해써!
             server_output = sb.toString();
             JSONObject jsObj = new JSONObject(server_output);
-            String buffer = jsObj.getString("filedata");
-            //image = buffer.getBytes();
+            JSONArray jsArr = jsObj.getJSONArray("DB_Output");
+            for (int i=0;i<jsArr.length();i++) {
+                JSONObject userObj = jsArr.getJSONObject(i);
+                String temp = userObj.getString("filedata");
+                System.out.println(temp);
 
+                images.add(temp);
+            }
+            //buffer = jsObj.getString("filedata");
+            //image = buffer.getBytes();
+            //System.out.println(buffer);
 
         }catch (Exception e) {
             e.getMessage();
         } finally {
             conn.disconnect();
         }
-        result.add(server_output);
+        //result.add(server_output);
 
-        //return myDicts;
-        return result;
+        return images;
     }
 }

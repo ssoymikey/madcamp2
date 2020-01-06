@@ -1,27 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+android:layout_height="match_parent"
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/login_button"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:theme="@style/TabTheme"
-        android:id="@+id/appBar">
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp" />
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/layout_tab"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+    <Button
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:text="logout"
+        android:padding="17dp"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="20dp"
+        android:id="@+id/logout_button"/>
 
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/pager_content"
-        android:layout_below="@id/appBar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
+    <Button
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="skip"
+        android:padding="17dp"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="20dp"
+        android:id="@+id/skip_button"/>
 
 </RelativeLayout>

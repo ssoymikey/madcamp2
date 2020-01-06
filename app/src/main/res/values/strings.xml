@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Canvas Life</string>
+    <string name="facebook_app_id">2366191637024577</string> <string name="fb_login_protocol_scheme">fb2366191637024577</string>
 </resources>
