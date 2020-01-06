@@ -1,10 +1,12 @@
 package com.example.project2;
 
 import android.content.Context;
+import android.content.Intent;
 import android.icu.text.Transliterator;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.Image;
 import android.os.Bundle;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.view.LayoutInflater;
@@ -13,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
@@ -44,6 +47,7 @@ public class kicycle_Activity extends AppCompatActivity {
     SupportMapFragment mapFragment;
     GoogleMap map;
     MarkerOptions myLocationMarker;
+
     //String [] rent_place = {"아름관", "창의관", "카이마루"};
 
 
@@ -61,6 +65,40 @@ public class kicycle_Activity extends AppCompatActivity {
         setContentView(R.layout.kicycle_main);
 
         Button button_register = findViewById(R.id.register);
+        ImageView button_profile = findViewById(R.id.profile);
+        ImageView button_alimi = findViewById(R.id.alimi);
+
+        Intent intent = getIntent();
+        final String UserID = intent.getExtras().getString("UserID");
+
+        button_profile.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Toast.makeText(getApplicationContext(), UserID, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        button_alimi.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                View view = LayoutInflater.from(v.getContext()).inflate(R.layout.alimi, null, false);
+                builder.setView(view);
+
+                final AlertDialog dialog = builder.create();
+                final Button alimi_close = view.findViewById(R.id.register_close);
+                alimi_close.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.show();
+
+
+
+            }
+        });
 
         //Register button Listner
         button_register.setOnClickListener(new View.OnClickListener() {
@@ -71,6 +109,7 @@ public class kicycle_Activity extends AppCompatActivity {
                 builder.setView(view);
 
                 final Button register_submit = view.findViewById(R.id.register_submit);
+                final Button register_close = view.findViewById(R.id.register_close);
                 final EditText register_name = view.findViewById(R.id.register_name);
                 final EditText register_phone = view.findViewById(R.id.register_phone);
                 final EditText register_password = view.findViewById(R.id.register_password);
@@ -103,6 +142,11 @@ public class kicycle_Activity extends AppCompatActivity {
                     public void onNothingSelected(AdapterView<?> parent) {}
                 });
 
+                register_close.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
 
                 //register submit button listner
                 register_submit.setOnClickListener(new View.OnClickListener() {
@@ -143,6 +187,7 @@ public class kicycle_Activity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
+
                 dialog.show();
             }
         });

@@ -4,12 +4,22 @@
     android:layout_height="match_parent"
     android:background="@drawable/kicycle_background">
 
+    <ImageView
+        android:id="@+id/alimi"
+        android:layout_width="55dp"
+        android:layout_height="54dp"/>
+    <ImageView
+        android:id="@+id/profile"
+        android:layout_width="55dp"
+        android:layout_height="54dp"/>
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginTop="130dp">
+        android:layout_marginTop="30dp">
 
         <Button
             android:id="@+id/register"
@@ -17,12 +27,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="REGISTER" />
-
-        <Button
-            android:id="@+id/use"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="USE"/>
 
 
     </LinearLayout>
