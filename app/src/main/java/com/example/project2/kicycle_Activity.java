@@ -9,6 +9,7 @@ import android.location.LocationManager;
 import android.media.Image;
 import android.os.Bundle;
 import android.telephony.PhoneNumberFormattingTextWatcher;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
@@ -22,12 +23,14 @@ import android.widget.LinearLayout;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -63,27 +66,85 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
     RecyclerView mRecyclerView;
     LinearLayout bikeInfoLayout;
 
+    String UserID = new String();
+    String UserPhone = new String();
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.kicycle_main);
 
         Button button_register = findViewById(R.id.register);
-        ImageView button_profile = findViewById(R.id.profile);
+        Button button_rentend = findViewById(R.id.rent_end);
+        Button button_delete = findViewById(R.id.delete);
         ImageView button_alimi = findViewById(R.id.alimi);
+        final DrawerLayout profile_drawer = findViewById(R.id.drawer_profile);
 
         Intent intent = getIntent();
-        final String UserID = intent.getExtras().getString("UserID");
+        UserID = intent.getExtras().getString("UserID");
+        UserPhone = intent.getExtras().getString("UserPhone");
 
-        button_profile.setOnClickListener(new View.OnClickListener(){
+        DrawerLayout.DrawerListener profile_drawer_listner = new DrawerLayout.DrawerListener() {
             @Override
-            public void onClick(View v){
-                Toast.makeText(getApplicationContext(), UserID, Toast.LENGTH_SHORT).show();
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
             }
-        });
+
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+                TextView profile_ID = findViewById(R.id.profile_ID);
+                TextView profile_Phone = findViewById(R.id.profile_phone);
+                profile_ID.setText(UserID);
+                profile_Phone.setText(UserPhone);
+
+                TextView profile_money = findViewById(R.id.profile_money);
+                Account account = new Account();
+
+                GetAccountAsyncTask accTask = new GetAccountAsyncTask("http://192.249.19.251:980/login");
+                try {
+                    account = accTask.execute(UserID).get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+                profile_money.setText(account.getMoney());
+
+                ArrayList<Bicycle> bicycles = new ArrayList<Bicycle>();
+                GetBikeAsyncTask bikeTask = new GetBikeAsyncTask("http://192.249.19.251:980/drawer");
+                try {
+                    bicycles = bikeTask.execute(UserPhone).get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+                TextView profile_myBike = findViewById(R.id.profile_mybike);
+                TextView profile_rentBike = findViewById(R.id.profile_rentbike);
+                profile_myBike.setText("None");
+                profile_rentBike.setText("None");
+
+                for(int i=0;i<bicycles.size();i++) {
+                    if(bicycles.get(i).getUser_phNumber().equals(UserPhone))
+                        profile_myBike.setText(bicycles.get(i).getRentPhone());
+
+                    if(bicycles.get(i).getRentPhone().equals(UserPhone))
+                        profile_rentBike.setText(bicycles.get(i).getUser_phNumber());
+                }
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) { }
+
+            @Override
+            public void onDrawerStateChanged(int newState) { }
+        };
+
+        profile_drawer.addDrawerListener(profile_drawer_listner);
 
         button_alimi.setOnClickListener(new View.OnClickListener(){
-            @Override
+                @Override
             public void onClick(View v){
                 AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                 View view = LayoutInflater.from(v.getContext()).inflate(R.layout.alimi, null, false);
@@ -98,9 +159,6 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
                 });
 
                 dialog.show();
-
-
-
             }
         });
 
@@ -114,13 +172,10 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
 
                 final Button register_submit = view.findViewById(R.id.register_submit);
                 final Button register_close = view.findViewById(R.id.register_close);
-                final EditText register_name = view.findViewById(R.id.register_name);
-                final EditText register_phone = view.findViewById(R.id.register_phone);
                 final EditText register_password = view.findViewById(R.id.register_password);
                 final Spinner startpoint = view.findViewById(R.id.register_startpoint);
                 final Spinner endpoint = view.findViewById(R.id.register_endpoint);
 
-                register_phone.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
 
                 final AlertDialog dialog = builder.create();
 
@@ -158,8 +213,8 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
                     public void onClick(View v) {
 
                         // 4. 사용자가 입력한 내용을 가져와서
-                        String strName = register_name.getText().toString();
-                        String strPhone = register_phone.getText().toString();
+                        String strName = UserID;
+                        String strPhone = UserPhone;
                         String strPassword = register_password.getText().toString();
                         String strStartpoint = rentpoint_name[0].toString();
                         String strEndpoint = rentpoint_name[1].toString();
@@ -171,6 +226,7 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
                             Registerinfo.put("password", strPassword);
                             Registerinfo.put("startpoint", strStartpoint);
                             Registerinfo.put("endpoint", strEndpoint);
+                            Registerinfo.put("rentphone", "None");
                             Registerinfo.put("available", "1");
 
                         } catch (JSONException e) {
@@ -182,7 +238,7 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
                         SetContactsAsyncTask task = new SetContactsAsyncTask("PUT", "http://192.249.19.251:980/register");
                         try {
                             boolean success = task.execute(json).get();
-                            Toast.makeText(v.getContext(), "PUT to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(v.getContext(), "PUT to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         } catch (ExecutionException e) {
@@ -194,6 +250,40 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
                 });
 
                 dialog.show();
+            }
+        });
+
+        button_rentend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // send to server
+                SetContactsAsyncTask task = new SetContactsAsyncTask("PUT", "http://192.249.19.251:980/rent_end");
+                try {
+                    boolean success = task.execute(UserPhone).get();
+                    //Toast.makeText(v.getContext(), "PUT to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        button_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // send to server
+                SetContactsAsyncTask task = new SetContactsAsyncTask("PUT", "http://192.249.19.251:980/delete");
+                try {
+                    boolean success = task.execute(UserPhone).get();
+                    //Toast.makeText(v.getContext(), "PUT to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -230,7 +320,7 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
 
 
         mArrayList = new ArrayList<Bicycle>();
-        mAdapter = new BicycleAdapter(kicycle_Activity.this, mArrayList);
+        mAdapter = new BicycleAdapter(kicycle_Activity.this, mArrayList, UserPhone);
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.notifyDataSetChanged();
@@ -385,10 +475,10 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
     public ArrayList<Bicycle> getBikes(String start) {
         ArrayList<Bicycle> bicycles = new ArrayList<Bicycle>();
 
-        GetBikeAsyncTask task = new GetBikeAsyncTask();
+        GetBikeAsyncTask task = new GetBikeAsyncTask("http://192.249.19.251:980/bike");
         try {
             bicycles = task.execute(start).get();
-            Toast.makeText(getApplicationContext(), "GET to MongoDB!!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "GET to MongoDB!!", Toast.LENGTH_SHORT).show();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {

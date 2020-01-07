@@ -51,6 +51,7 @@ public class BicycleAdapter extends RecyclerView.Adapter<BicycleAdapter.CustomVi
 
     private ArrayList<Bicycle> mList;
     private Context mContext;
+    private String userPhone;
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
         protected TextView end;
@@ -87,14 +88,26 @@ public class BicycleAdapter extends RecyclerView.Adapter<BicycleAdapter.CustomVi
                         phone.setText(mList.get(getAdapterPosition()).getUser_phNumber());
                         pwd.setText(mList.get(getAdapterPosition()).getPwd());
 
+                        JSONObject Registerinfo = new JSONObject();
+                        try {
+                            Registerinfo.put("phone", mList.get(getAdapterPosition()).getUser_phNumber());
+                            Registerinfo.put("rentphone", userPhone);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        // send to server
+                        final String json = Registerinfo.toString();
+
                         final AlertDialog dialog = builder.create();
                         ButtonSubmit.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 SetContactsAsyncTask task = new SetContactsAsyncTask("PUT", "http://192.249.19.251:980/setfalse");
                                 try {
-                                    boolean success = task.execute(mList.get(getAdapterPosition()).getUser_phNumber()).get();
-                                    Toast.makeText(v.getContext(), "PUT to MongoDB!! : " + success, Toast.LENGTH_SHORT).show();
+                                    boolean success = task.execute(json).get();
+                                    //Toast.makeText(v.getContext(), "PUT to MongoDB!! : " + success, Toast.LENGTH_SHORT).show();
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 } catch (ExecutionException e) {
@@ -103,10 +116,10 @@ public class BicycleAdapter extends RecyclerView.Adapter<BicycleAdapter.CustomVi
 
                                 ArrayList<Bicycle> bicycles = new ArrayList<Bicycle>();
 
-                                GetBikeAsyncTask gettask = new GetBikeAsyncTask();
+                                GetBikeAsyncTask gettask = new GetBikeAsyncTask("http://192.249.19.251:980/bike");
                                 try {
                                     bicycles = gettask.execute(mList.get(getAdapterPosition()).getStart()).get();
-                                    Toast.makeText(getApplicationContext(), "GET to MongoDB!!", Toast.LENGTH_SHORT).show();
+                                    //Toast.makeText(getApplicationContext(), "GET to MongoDB!!", Toast.LENGTH_SHORT).show();
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 } catch (ExecutionException e) {
@@ -140,9 +153,10 @@ public class BicycleAdapter extends RecyclerView.Adapter<BicycleAdapter.CustomVi
         return viewHolder;
     }
 
-    public BicycleAdapter(Context context, ArrayList<Bicycle> list) {
+    public BicycleAdapter(Context context, ArrayList<Bicycle> list, String userPhone) {
         mList = list;
         mContext = context;
+        this.userPhone = userPhone;
     }
 
     public void addItem(ArrayList<Bicycle> bicycles) {

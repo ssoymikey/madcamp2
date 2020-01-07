@@ -29,7 +29,7 @@ public class FragmentMain extends AppCompatActivity {
         tabLayout = findViewById(R.id.layout_tab);
         tabLayout.addTab(tabLayout.newTab().setText("연락처"));
         tabLayout.addTab(tabLayout.newTab().setText("갤러리"));
-        tabLayout.addTab(tabLayout.newTab().setText("3번"));
+        tabLayout.addTab(tabLayout.newTab().setText("KICYCLE"));
 
         viewPager = findViewById(R.id.pager_content);
         mContentsPagerAdapter = new ContentsPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());

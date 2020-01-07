@@ -48,6 +48,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toRightOf="@id/phone_listitem"
         android:text="전화"
+        android:textColor="#FFFFFF"
         android:background="@drawable/round_button_green" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

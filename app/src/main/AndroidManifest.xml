@@ -22,8 +22,8 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="Project2"
+        android:icon="@drawable/kicycle_icon"
+        android:label="KICYCLE"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">

@@ -14,21 +14,21 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class GetBikeAsyncTask extends AsyncTask<String, Void, ArrayList<Bicycle>> {
+public class GetAccountAsyncTask extends AsyncTask<String, Void, Account> {
     static String server_output = null;
     static String temp_output = null;
     static String murl = null;
 
-    public GetBikeAsyncTask(String url) {
+    public GetAccountAsyncTask(String url) {
         this.murl = url;
     }
 
     @Override
-    protected ArrayList<Bicycle> doInBackground(String... arg0) {
+    protected Account doInBackground(String... arg0) {
         HttpURLConnection conn = null;
         String start = arg0[0];
 
-        ArrayList<Bicycle> myBikes = new ArrayList<Bicycle>();
+        Account myAcc = new Account();
         try {
             URL url = new URL(murl);
             conn = (HttpURLConnection) url.openConnection();
@@ -65,21 +65,12 @@ public class GetBikeAsyncTask extends AsyncTask<String, Void, ArrayList<Bicycle>
             JSONObject jsObj = new JSONObject(server_output);
             System.out.println("1: "+jsObj);
 
-            JSONArray contacts = jsObj.getJSONArray("DB_Output");
-            System.out.println("2: "+contacts.length());
-            for (int i=0;i<contacts.length();i++) {
-                JSONObject userObj = contacts.getJSONObject(i);
+            JSONObject userObj = jsObj.getJSONObject("DB_Output");
 
-                Bicycle temp = new Bicycle();
-                temp.setUser_Name(userObj.getString("name"));
-                temp.setUser_phNumber(userObj.getString("phone"));
-                temp.setStart(userObj.getString("startpoint"));
-                temp.setEnd(userObj.getString("endpoint"));
-                temp.setPwd(userObj.getString("password"));
-                temp.setAvail(userObj.getString("available"));
-                temp.setRentPhone(userObj.getString("rentphone"));
-                myBikes.add(temp);
-            }
+            myAcc.setID(userObj.getString("name"));
+            myAcc.setPhone(userObj.getString("phone"));
+            myAcc.setPwd(userObj.getString("password"));
+            myAcc.setMoney(userObj.getString("money"));
 
         }catch (Exception e) {
             e.getMessage();
@@ -87,7 +78,7 @@ public class GetBikeAsyncTask extends AsyncTask<String, Void, ArrayList<Bicycle>
             conn.disconnect();
         }
 
-        return myBikes;
+        return myAcc;
         //return server_output;
     }
 }
