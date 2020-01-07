@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -211,7 +212,7 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
             e.printStackTrace();
         }
 
-        Button backbutton = findViewById(R.id.back_button);
+        ImageButton backbutton = findViewById(R.id.back_button);
         backbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -228,7 +229,7 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
 
 
         mArrayList = new ArrayList<Bicycle>();
-        mAdapter = new BicycleAdapter(getApplicationContext(), mArrayList);
+        mAdapter = new BicycleAdapter(kicycle_Activity.this, mArrayList);
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.notifyDataSetChanged();
@@ -370,7 +371,7 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
         bikeInfoLayout.setVisibility(View.VISIBLE);
         Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.alpha);
         bikeInfoLayout.startAnimation(anim);
-        map.moveCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+        map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
         marker.showInfoWindow();
         //Toast.makeText(this, marker.getTitle() +" "+marker.getPosition(), Toast.LENGTH_SHORT).show();
 

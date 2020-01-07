@@ -1,10 +1,10 @@
 package com.example.project2;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -53,6 +53,41 @@ public class BicycleAdapter extends RecyclerView.Adapter<BicycleAdapter.CustomVi
             super(view);
             this.end = view.findViewById(R.id.dest);
             this.name = view.findViewById(R.id.name);
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final Button ButtonSubmit;
+                    final TextView startEnd;
+                    final TextView name;
+                    final TextView phone;
+                    final TextView pwd;
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                    v = LayoutInflater.from(mContext).inflate(R.layout.borrow_box, null, false);
+                    builder.setView(v);
+                    ButtonSubmit = v.findViewById(R.id.confirm);
+                    startEnd = v.findViewById(R.id.start_end);
+                    name = v.findViewById(R.id.name);
+                    phone = v.findViewById(R.id.phone);
+                    pwd = v.findViewById(R.id.password);
+
+                    startEnd.setText( mList.get(getAdapterPosition()).getStart() + " -> " + mList.get(getAdapterPosition()).getEnd());
+                    name.setText(mList.get(getAdapterPosition()).getUser_Name());
+                    phone.setText(mList.get(getAdapterPosition()).getUser_phNumber());
+                    pwd.setText(mList.get(getAdapterPosition()).getPwd());
+
+                    final AlertDialog dialog = builder.create();
+                    ButtonSubmit.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    dialog.show();
+                }
+            });
         }
     }
 
