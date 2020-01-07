@@ -7,10 +7,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import com.example.project2.R;
+import com.example.project2.SetContactsAsyncTask;
 import com.example.project2.kicycle_Activity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.concurrent.ExecutionException;
 
 
 public class MemoFragment extends Fragment {
@@ -50,7 +57,33 @@ public class MemoFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), kicycle_Activity.class);
                 String UserID = login_ID.getText().toString();
+                String UserPassword = login_password.getText().toString();
+                String UserPhone = login_password.getText().toString();
 
+
+                //send to server (in case create)
+                JSONObject accountinfo = new JSONObject();
+                try {
+                    accountinfo.put("ID", UserID);
+                    accountinfo.put("phone", UserPhone);
+                    accountinfo.put("password", UserPassword);
+                    accountinfo.put("money", "500");
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                // send to server
+                String json = accountinfo.toString();
+                SetContactsAsyncTask task = new SetContactsAsyncTask("POST", "http://192.249.19.251:980/account");
+                try {
+                    boolean success = task.execute(json).get();
+                    Toast.makeText(v.getContext(), "PUT to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
                 intent.putExtra("UserID", UserID);
                 startActivity(intent);
             }

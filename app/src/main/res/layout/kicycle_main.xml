@@ -1,74 +1,255 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_profile"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/kicycle_background">
+    android:fitsSystemWindows="true">
 
-    <ImageView
-        android:id="@+id/alimi"
-        android:layout_width="55dp"
-        android:layout_height="54dp"/>
-    <ImageView
-        android:id="@+id/profile"
-        android:layout_width="55dp"
-        android:layout_height="54dp"/>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginTop="130dp"
-        android:id="@+id/first_layout">
-
-        <Button
-            android:id="@+id/register"
-            style="@style/Widget.AppCompat.Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="REGISTER" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignTop="@id/first_layout"
-        android:id="@+id/second_layout"
-        android:layout_marginTop="40dp">
+        android:background="@drawable/kicycle_background">
 
-        <fragment
-            android:id="@+id/map"
-            class="com.google.android.gms.maps.SupportMapFragment"
+        <ImageView
+            android:id="@+id/alimi"
+            android:layout_width="55dp"
+            android:layout_height="54dp" />
+        <ImageView
+            android:id="@+id/profile"
+            android:layout_width="55dp"
+            android:layout_height="54dp"
+            android:layout_below ="@id/alimi"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="130dp"
+            android:id="@+id/first_layout">
+
+            <Button
+                android:id="@+id/register"
+                style="@style/Widget.AppCompat.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="REGISTER" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="20dp"/>
-    </LinearLayout>
+            android:layout_alignTop="@id/first_layout"
+            android:id="@+id/second_layout"
+            android:layout_marginTop="40dp">
+
+            <fragment
+                android:id="@+id/map"
+                class="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="20dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:orientation="vertical"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/third_layout"
+            android:background="@drawable/white_background"
+            android:visibility="invisible" >
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Back"
+                android:padding="10dp"
+                android:id="@+id/back_button" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerview_main_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbarFadeDuration="0"
+                android:scrollbarSize="5dp"
+                android:scrollbarThumbVertical="@android:color/darker_gray"
+                android:scrollbars="vertical"/>
+        </LinearLayout>
+
+    </RelativeLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:orientation="vertical"
-        android:layout_alignParentBottom="true"
-        android:id="@+id/third_layout"
-        android:background="@drawable/white_background"
-        android:visibility="invisible" >
+        android:layout_width="350dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="left"
+        android:orientation="vertical">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Back"
-            android:padding="10dp"
-            android:id="@+id/back_button" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerview_main_list"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbarFadeDuration="0"
-            android:scrollbarSize="5dp"
-            android:scrollbarThumbVertical="@android:color/darker_gray"
-            android:scrollbars="vertical"/>
+            android:layout_height="wrap_content"
+            android:background="#99ED"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="204dp"
+                android:layout_height="104dp"
+                android:layout_marginTop="30dp"
+                android:src="@drawable/bicycle"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginBottom="10dp"
+                android:text="PROFILE"
+                android:textSize="30dp"
+                android:textColor="#000000"
+                android:textStyle="italic"/>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:background="@drawable/profile_balloon">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="10dp"
+                android:text="ID"
+                android:textSize="20dp"/>
+
+            <TextView
+                android:id="@+id/profile_ID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="20dp"
+                android:text="찬우"
+                android:textSize="20dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:background="@drawable/profile_balloon">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="10dp"
+                android:text="PHONE"
+                android:textSize="20dp"/>
+
+            <TextView
+                android:id="@+id/profile_phone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="20dp"
+                android:text="01052536595"
+                android:textSize="20dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:background="@drawable/profile_balloon">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="10dp"
+                android:text="MONEY"
+                android:textSize="20dp"/>
+
+            <TextView
+                android:id="@+id/profile_money"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="20dp"
+                android:text="500만원"
+                android:textSize="20dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:background="@drawable/profile_balloon">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="10dp"
+                android:text="내 자전거"
+                android:textSize="20dp"/>
+
+            <TextView
+                android:id="@+id/profile_mybike"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="20dp"
+                android:textSize="20dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:background="@drawable/profile_balloon">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="10dp"
+                android:text="이용중"
+                android:textSize="20dp"/>
+
+            <TextView
+                android:id="@+id/profile_rentbike"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginRight="20dp"
+                android:textSize="20dp"/>
+        </LinearLayout>
+
     </LinearLayout>
 
-</RelativeLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

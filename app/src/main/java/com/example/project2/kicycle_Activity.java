@@ -9,6 +9,7 @@ import android.location.LocationManager;
 import android.media.Image;
 import android.os.Bundle;
 import android.telephony.PhoneNumberFormattingTextWatcher;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
@@ -21,12 +22,14 @@ import android.widget.LinearLayout;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -62,6 +65,8 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
     RecyclerView mRecyclerView;
     LinearLayout bikeInfoLayout;
 
+    String UserID = new String();
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,16 +75,35 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
         Button button_register = findViewById(R.id.register);
         ImageView button_profile = findViewById(R.id.profile);
         ImageView button_alimi = findViewById(R.id.alimi);
+        final DrawerLayout profile_drawer = findViewById(R.id.drawer_profile);
 
         Intent intent = getIntent();
-        final String UserID = intent.getExtras().getString("UserID");
+        UserID = intent.getExtras().getString("UserID");
 
-        button_profile.setOnClickListener(new View.OnClickListener(){
+
+        DrawerLayout.DrawerListener profile_drawer_listner = new DrawerLayout.DrawerListener() {
             @Override
-            public void onClick(View v){
-                Toast.makeText(getApplicationContext(), UserID, Toast.LENGTH_SHORT).show();
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
             }
-        });
+
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+                TextView profile_ID = findViewById(R.id.profile_ID);
+                profile_ID.setText(UserID);
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        };
+
+        profile_drawer.addDrawerListener(profile_drawer_listner);
 
         button_alimi.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -97,9 +121,6 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
                 });
 
                 dialog.show();
-
-
-
             }
         });
 
