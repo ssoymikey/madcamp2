@@ -107,7 +107,7 @@
             android:layout_width="100dp"
             android:layout_height="40dp"
             android:layout_marginRight="20dp"
-            android:background="@drawable/rectangle_button"
+            android:background="@drawable/rectangle_button_green_corner"
             android:text="추가" />
 
         <Button
@@ -115,7 +115,7 @@
             android:id="@+id/register_close"
             android:layout_width="100dp"
             android:layout_height="40dp"
-            android:background="@drawable/rectangle_button"
+            android:background="@drawable/rectangle_button_green_corner"
             android:text="취소" />
 
     </LinearLayout>

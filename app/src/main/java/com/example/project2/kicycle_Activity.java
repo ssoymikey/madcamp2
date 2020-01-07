@@ -171,6 +171,7 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
                             Registerinfo.put("password", strPassword);
                             Registerinfo.put("startpoint", strStartpoint);
                             Registerinfo.put("endpoint", strEndpoint);
+                            Registerinfo.put("available", "1");
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -303,57 +304,57 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
         myLocationMarker = new MarkerOptions();
         myLocationMarker.position(new LatLng(36.373986, 127.356660));
         myLocationMarker.title("아름관");
-        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_pin));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.370347, 127.362593));
         myLocationMarker.title("창의관");
-        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_pin));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.373802, 127.359253));
         myLocationMarker.title("카이마루");
-        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_pin));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.374369, 127.365635));
         myLocationMarker.title("N1");
-        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_pin));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.373482, 127.362643));
         myLocationMarker.title("인사동");
-        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_pin));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.371174, 127.357922));
         myLocationMarker.title("노천극장");
-        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_pin));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.368467, 127.362627));
         myLocationMarker.title("오리연못");
-        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_pin));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.369241, 127.365199));
         myLocationMarker.title("E3");
-        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_pin));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.366141, 127.363672));
         myLocationMarker.title("정문");
-        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_pin));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.364399, 127.358784));
         myLocationMarker.title("쪽문");
-        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_pin));
         map.addMarker(myLocationMarker);
 
         myLocationMarker.position(new LatLng(36.368625, 127.356944));
         myLocationMarker.title("희망관");
-        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.current_location));
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_pin));
         map.addMarker(myLocationMarker);
 
         map.setOnMarkerClickListener(this);

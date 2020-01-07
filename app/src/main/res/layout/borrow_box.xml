@@ -131,6 +131,6 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:text="확인"
-        android:background="@drawable/rectangle_button" />
+        android:background="@drawable/rectangle_button_green_corner" />
 
 </LinearLayout>

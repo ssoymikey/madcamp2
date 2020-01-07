@@ -6,6 +6,7 @@ public class Bicycle {
     private String start;
     private String end;
     private String pwd;
+    private String avail;
 
     public Bicycle() {}
 
@@ -47,10 +48,15 @@ public class Bicycle {
         this.pwd = pwd;
     }
 
-    public Bicycle(String user_Name, String user_phNumber, String start, String end) {
+    public String getAvail() { return avail; }
+
+    public void setAvail(String avail) { this.avail = avail; }
+
+    public Bicycle(String user_Name, String user_phNumber, String start, String end, String avail) {
         this.user_Name = user_Name;
         this.user_phNumber = user_phNumber;
         this.start = start;
         this.end = end;
+        this.avail = avail;
     }
 }

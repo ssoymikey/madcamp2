@@ -71,6 +71,7 @@ public class GetBikeAsyncTask extends AsyncTask<String, Void, ArrayList<Bicycle>
                 temp.setStart(userObj.getString("startpoint"));
                 temp.setEnd(userObj.getString("endpoint"));
                 temp.setPwd(userObj.getString("password"));
+                temp.setAvail(userObj.getString("available"));
                 myBikes.add(temp);
             }
 
