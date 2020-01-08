@@ -77,14 +77,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        logoutButton = (Button) findViewById(R.id.logout_button);
-        logoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LoginManager.getInstance().logOut();
-            }
-        });
-
         skipButton = (Button) findViewById(R.id.skip_button);
         skipButton.setOnClickListener(new View.OnClickListener() {
             @Override
