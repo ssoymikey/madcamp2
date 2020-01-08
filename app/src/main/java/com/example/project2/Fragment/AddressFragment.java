@@ -126,7 +126,7 @@ public class AddressFragment extends Fragment {
                         SetContactsAsyncTask task = new SetContactsAsyncTask("PUT", "http://192.249.19.251:980/contact");
                         try {
                             boolean success = task.execute(json).get();
-                            Toast.makeText(v.getContext(), "PUT to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(v.getContext(), "PUT to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         } catch (ExecutionException e) {
@@ -159,7 +159,7 @@ public class AddressFragment extends Fragment {
                 SetContactsAsyncTask task = new SetContactsAsyncTask("POST", "http://192.249.19.251:980/contact");
                 try {
                     boolean success = task.execute(json).get();
-                    Toast.makeText(v.getContext(), "POST to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(v.getContext(), "POST to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (ExecutionException e) {
@@ -202,7 +202,7 @@ public class AddressFragment extends Fragment {
                     SetContactsAsyncTask task = new SetContactsAsyncTask("DELETE", "http://192.249.19.251:980/contact");
                     try {
                         boolean success = task.execute(json).get();
-                        Toast.makeText(v.getContext(), "DELETE to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(v.getContext(), "DELETE to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     } catch (ExecutionException e) {
@@ -241,7 +241,7 @@ public class AddressFragment extends Fragment {
                 mArrayList.add(FetchedData);
             }
 
-            Toast.makeText(v.getContext(), "Fetched from MongoDB!!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(v.getContext(), "Fetched from MongoDB!!", Toast.LENGTH_SHORT).show();
 
         } catch (InterruptedException e) {
             e.printStackTrace();

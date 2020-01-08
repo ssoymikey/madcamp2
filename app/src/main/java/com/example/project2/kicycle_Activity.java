@@ -267,6 +267,9 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                 }
+
+                Toast.makeText(getApplicationContext(), "자전거 반납 완료", Toast.LENGTH_SHORT).show();
+                bikeInfoLayout.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -284,6 +287,9 @@ public class kicycle_Activity extends AppCompatActivity implements GoogleMap.OnM
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                 }
+
+                Toast.makeText(getApplicationContext(), "자전거 삭제 완료", Toast.LENGTH_SHORT).show();
+                bikeInfoLayout.setVisibility(View.INVISIBLE);
             }
         });
 

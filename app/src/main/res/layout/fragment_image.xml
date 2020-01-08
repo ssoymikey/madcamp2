@@ -34,12 +34,14 @@
     <Button
         style="@style/Widget.AppCompat.Button.Colored"
         android:id="@+id/camera_btn"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:background="@drawable/round_button"
         android:text="카메라"
+        android:textStyle="bold"
+        android:textSize="15dp"
         android:layout_marginBottom="20dp"
         android:layout_marginRight="20dp"/>
 

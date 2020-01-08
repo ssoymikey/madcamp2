@@ -154,7 +154,7 @@ public class ImageFragment extends Fragment {
                 //context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + Environment.getExternalStorageDirectory())));
                 v.getContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + mBasePath)));
             }
-            Toast.makeText(v.getContext().getApplicationContext(), "저장완료 : "+currentPhotoPath, Toast.LENGTH_LONG).show();
+            //Toast.makeText(v.getContext().getApplicationContext(), "저장완료 : "+currentPhotoPath, Toast.LENGTH_LONG).show();
         }
 
         // 왠진 모르겠는데 이거 해야 깨진 사진이 하나 더 생기는 오류가 안 생김
@@ -235,7 +235,8 @@ public class ImageFragment extends Fragment {
                 SetImageAsyncTask task = new SetImageAsyncTask("POST", "http://192.249.19.251:980/gallery");
                 try {
                     boolean success = task.execute(filename).get();
-                    Toast.makeText(v.getContext(), "POST to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
+                    //
+                    //Toast.makeText(v.getContext(), "POST to MongoDB!! : "+success, Toast.LENGTH_SHORT).show();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (ExecutionException e) {
